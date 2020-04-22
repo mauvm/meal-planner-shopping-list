@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "lib": ["es2020"],
+    "module": "commonjs",
+    "target": "es2019",
+
+    "outDir": "build/",
+
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "esModuleInterop": true
+  },
+  "exclude": ["node_modules", "src/**/*.spec.ts"],
+  "include": ["src/**/*.ts"]
+}
