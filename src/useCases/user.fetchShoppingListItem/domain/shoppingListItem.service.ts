@@ -6,11 +6,11 @@ import ShoppingListItemRepository from '../infra/shoppingListItem.repository'
 export default class ShoppingListItemService {
   constructor(private repository: ShoppingListItemRepository) {}
 
-  async findOneByIdOrFail(uuid: string): Promise<ShoppingListItemEntity> {
-    const item = await this.repository.findOne(uuid)
+  async findOneByIdOrFail(id: string): Promise<ShoppingListItemEntity> {
+    const item = await this.repository.findOne(id)
 
     if (!item) {
-      throw new Error(`Shopping list item "${uuid}" not found!`)
+      throw new Error(`Shopping list item "${id}" not found!`)
     }
 
     return item

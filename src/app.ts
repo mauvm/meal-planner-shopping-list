@@ -1,3 +1,4 @@
+import { Server } from 'http'
 import { container } from 'tsyringe'
 import Koa from 'koa'
 import {
@@ -35,4 +36,6 @@ export async function createApp(): Promise<Koa> {
   return app
 }
 
-export async function cleanUpApp(app: Koa) {}
+export async function cleanUpApp(server: Server) {
+  server.close()
+}

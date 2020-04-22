@@ -4,7 +4,7 @@
     "module": "commonjs",
     "target": "es2019",
 
-    "outDir": "build/",
+    "outDir": ".test/build/",
 
     "noImplicitAny": true,
     "strictNullChecks": true,
@@ -13,6 +13,6 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true
   },
-  "exclude": ["node_modules/", "src/test.ts", "src/**/*.spec.ts"],
+  "exclude": ["node_modules/", "src/server.ts"],
   "include": ["src/**/*.ts"]
 }

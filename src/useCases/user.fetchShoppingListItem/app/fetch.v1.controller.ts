@@ -4,14 +4,14 @@ import { IsUUID, IsString } from 'class-validator'
 import { plainToClass, classToPlain } from 'class-transformer'
 import ShoppingListItemService from '../domain/shoppingListItem.service'
 
-class FetchParamsDTO {
+class FetchRequestParamsDTO {
   @IsUUID()
-  uuid: string
+  id: string
 }
 
 class FetchResponseDTO {
   @IsUUID()
-  uuid: string
+  id: string
 
   @IsString()
   title: string
@@ -22,9 +22,11 @@ class FetchResponseDTO {
 export default class ShoppingListItemFetchV1Controller {
   constructor(private service: ShoppingListItemService) {}
 
-  @Get('/:uuid')
-  async fetch(@Params() { uuid }: FetchParamsDTO): Promise<FetchResponseDTO> {
-    const item = await this.service.findOneByIdOrFail(uuid)
+  @Get('/:id')
+  async fetch(
+    @Params() { id }: FetchRequestParamsDTO,
+  ): Promise<FetchResponseDTO> {
+    const item = await this.service.findOneByIdOrFail(id)
 
     return plainToClass(FetchResponseDTO, classToPlain(item))
   }

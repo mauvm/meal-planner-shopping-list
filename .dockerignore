@@ -9,7 +9,7 @@ README.md
 .pnp.js
 
 # Testing
-/coverage/
+/.test/
 
 # Production
 /build/

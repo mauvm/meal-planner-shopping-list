@@ -4,9 +4,9 @@ import ShoppingListItemEntity from '../domain/shoppingListItem.entity'
 
 @singleton()
 export default class ShoppingListItemRepository {
-  async findOne(uuid: string): Promise<ShoppingListItemEntity | undefined> {
+  async findOne(id: string): Promise<ShoppingListItemEntity | undefined> {
     return plainToClass(ShoppingListItemEntity, {
-      uuid,
+      id,
       title: 'Vegetarisch gehakt',
     })
   }
