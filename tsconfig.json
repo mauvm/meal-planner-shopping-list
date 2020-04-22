@@ -8,7 +8,10 @@
 
     "noImplicitAny": true,
     "strictNullChecks": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true
   },
   "exclude": ["node_modules", "src/**/*.spec.ts"],
   "include": ["src/**/*.ts"]

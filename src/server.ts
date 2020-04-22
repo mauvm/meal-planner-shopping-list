@@ -1,9 +1,24 @@
-import Koa, { Context } from 'koa'
+import 'reflect-metadata'
+import { container } from 'tsyringe'
+import { createApp } from './app'
+import LoggerService from './useCases/dev.logging/domain/logger.service'
 
-const app = new Koa()
+async function run() {
+  try {
+    const port = Number(process.env.PORT) || 3000
+    const app = await createApp()
 
-app.use(async (ctx: Context) => {
-  ctx.body = 'Hello World'
-})
+    // Weirdly enough Koa's listen method uses a callback
+    await new Promise((resolve) => app.listen(port, resolve))
 
-app.listen(3000)
+    const logger = container.resolve(LoggerService)
+    logger.info(`Listening on port ${port}..`, { port })
+  } catch (err) {
+    const logger = container.resolve(LoggerService)
+    logger.error('Uncaught error:', err)
+
+    process.exit(1)
+  }
+}
+
+run()
