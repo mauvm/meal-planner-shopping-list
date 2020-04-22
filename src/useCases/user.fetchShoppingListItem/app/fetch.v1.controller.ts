@@ -1,8 +1,9 @@
 import { singleton } from 'tsyringe'
 import { JsonController, Get, Params } from 'routing-controllers'
-import { IsUUID, IsString } from 'class-validator'
-import { plainToClass, classToPlain } from 'class-transformer'
+import { IsUUID } from 'class-validator'
+import { plainToClass } from 'class-transformer'
 import ShoppingListItemService from '../domain/shoppingListItem.service'
+import ShoppingListItemEntity from '../domain/shoppingListItem.entity'
 
 class FetchRequestParamsDTO {
   @IsUUID()
@@ -10,11 +11,7 @@ class FetchRequestParamsDTO {
 }
 
 class FetchResponseDTO {
-  @IsUUID()
-  id: string
-
-  @IsString()
-  title: string
+  data: ShoppingListItemEntity
 }
 
 @singleton()
@@ -28,6 +25,6 @@ export default class ShoppingListItemFetchV1Controller {
   ): Promise<FetchResponseDTO> {
     const item = await this.service.findOneByIdOrFail(id)
 
-    return plainToClass(FetchResponseDTO, classToPlain(item))
+    return plainToClass(FetchResponseDTO, { data: item })
   }
 }
