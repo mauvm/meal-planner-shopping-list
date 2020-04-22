@@ -8,7 +8,7 @@ export default class LoggerService {
 
   constructor(private config: ConfigService) {
     this.logger = winston.createLogger({
-      level: config.get<string>('logger.level', 'debug'),
+      level: this.config.get<string>('logger.level', 'debug'),
     })
 
     this.logger.add(new winston.transports.Console())

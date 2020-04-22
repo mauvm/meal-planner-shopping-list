@@ -6,12 +6,15 @@ import HttpStatus from 'http-status-codes'
 import { uuid } from 'uuidv4'
 import { createApp, cleanUpApp } from '../../../app'
 import ConfigService from '../../dev.config/domain/config.service'
+import clearContainerInstances from '../../dev.test/lib/clearContainerInstances'
 
 describe('ShoppingListItemFetchV1Controller', () => {
   let server: Server
   let config: ConfigService
 
   beforeEach(async () => {
+    clearContainerInstances(container)
+
     config = container.resolve(ConfigService)
     config.set('logger.level', 'warn')
 
@@ -35,7 +38,9 @@ describe('ShoppingListItemFetchV1Controller', () => {
         .expect('Content-Type', /json/)
 
       // Test
-      expect(response.body).to.be.an('object')
+      expect(response.body?.data).to.be.an('object')
+      expect(response.body.data.id).to.be.a('string').that.is.not.empty
+      expect(response.body.data.title).to.be.a('string').that.is.not.empty
     })
   })
 })

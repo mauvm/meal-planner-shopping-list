@@ -6,7 +6,7 @@ import {
   useContainer,
   getMetadataArgsStorage,
 } from 'routing-controllers'
-import LoggerService from './useCases/dev.logging/domain/logger.service'
+import LoggerService from './useCases/dev.log/domain/logger.service'
 
 function debugRegisteredControllers(prefix: string) {
   const logger = container.resolve(LoggerService)
