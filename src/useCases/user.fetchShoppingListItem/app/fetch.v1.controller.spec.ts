@@ -1,15 +1,22 @@
 import { Server } from 'http'
+import { container } from 'tsyringe'
 import { expect } from 'chai'
 import request from 'supertest'
 import HttpStatus from 'http-status-codes'
 import { uuid } from 'uuidv4'
 import { createApp, cleanUpApp } from '../../../app'
+import ConfigService from '../../dev.config/domain/config.service'
 
 describe('ShoppingListItemFetchV1Controller', () => {
   let server: Server
+  let config: ConfigService
 
   beforeEach(async () => {
-    server = (await createApp()).listen()
+    config = container.resolve(ConfigService)
+    config.set('logger.level', 'warn')
+
+    const app = await createApp()
+    server = app.listen()
   })
 
   afterEach(async () => {

@@ -8,7 +8,7 @@ import {
 } from 'routing-controllers'
 import LoggerService from './useCases/dev.logging/domain/logger.service'
 
-function logRegisteredControllers(prefix: string) {
+function debugRegisteredControllers(prefix: string) {
   const logger = container.resolve(LoggerService)
 
   for (const { target, route } of getMetadataArgsStorage().controllers) {
@@ -20,6 +20,7 @@ function logRegisteredControllers(prefix: string) {
 }
 
 export async function createApp(): Promise<Koa> {
+  // Register IoC/DI container
   useContainer({
     get: container.resolve.bind(container),
   })
@@ -31,7 +32,7 @@ export async function createApp(): Promise<Koa> {
     classTransformer: true,
   }) as Koa
 
-  logRegisteredControllers(prefix)
+  debugRegisteredControllers(prefix)
 
   return app
 }

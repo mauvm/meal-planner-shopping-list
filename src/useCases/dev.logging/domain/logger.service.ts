@@ -1,11 +1,15 @@
 import { singleton } from 'tsyringe'
 import winston from 'winston'
+import ConfigService from '../../dev.config/domain/config.service'
 
 @singleton()
 export default class LoggerService {
   private logger: winston.Logger
-  constructor() {
-    this.logger = winston.createLogger({ level: 'debug' })
+
+  constructor(private config: ConfigService) {
+    this.logger = winston.createLogger({
+      level: config.get<string>('logger.level', 'debug'),
+    })
 
     this.logger.add(new winston.transports.Console())
   }
