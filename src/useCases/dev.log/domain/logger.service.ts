@@ -1,5 +1,8 @@
 import { singleton } from 'tsyringe'
 import winston from 'winston'
+import { SPLAT } from 'triple-beam'
+import YAML from 'yaml'
+import { highlight } from 'cli-highlight'
 import ConfigService from '../../dev.config/domain/config.service'
 
 @singleton()
@@ -11,7 +14,30 @@ export default class LoggerService {
       level: this.config.get<string>('logger.level', 'debug'),
     })
 
-    this.logger.add(new winston.transports.Console())
+    this.logger.add(
+      new winston.transports.Console({
+        format: winston.format.combine(
+          winston.format.colorize(),
+          winston.format.timestamp(),
+          winston.format.align(),
+          winston.format.printf((info) => {
+            const { timestamp, level, message } = info
+            const args = info[SPLAT] || {}
+            const ts = timestamp.slice(0, 19).replace('T', '')
+
+            return `${ts} [${level}]: ${message}${
+              Object.keys(args).length
+                ? '\n' +
+                  highlight(YAML.stringify(args), {
+                    language: 'yaml',
+                    ignoreIllegals: true,
+                  })
+                : ''
+            }`
+          }),
+        ),
+      }),
+    )
   }
 
   debug(message: string, ...meta: any[]): void {
