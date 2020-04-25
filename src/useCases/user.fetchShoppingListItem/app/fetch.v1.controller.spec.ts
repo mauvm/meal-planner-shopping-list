@@ -6,7 +6,7 @@ import HttpStatus from 'http-status-codes'
 import { uuid } from 'uuidv4'
 import { createApp, cleanUpApp } from '../../../app'
 import ConfigService from '../../dev.config/domain/config.service'
-import clearContainerInstances from '../../dev.test/lib/clearContainerInstances'
+import clearContainerInstances from '../../dev.test/infra/clearContainerInstances'
 
 describe('ShoppingListItemFetchV1Controller', () => {
   let server: Server
