@@ -1,5 +1,11 @@
 import { injectable } from 'tsyringe'
-import { IsUUID, IsString, IsNotEmpty } from 'class-validator'
+import {
+  IsUUID,
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsDate,
+} from 'class-validator'
 
 @injectable()
 export default class ShoppingListItemEntity {
@@ -9,4 +15,8 @@ export default class ShoppingListItemEntity {
   @IsNotEmpty()
   @IsString()
   title: string
+
+  @IsOptional()
+  @IsDate()
+  finishedAt?: Date
 }

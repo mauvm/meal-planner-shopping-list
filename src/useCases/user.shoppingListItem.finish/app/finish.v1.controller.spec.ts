@@ -1,17 +1,17 @@
 import { Server } from 'http'
 import { container } from 'tsyringe'
 import { expect } from 'chai'
+import { uuid } from 'uuidv4'
 import request from 'supertest'
 import HttpStatus from 'http-status-codes'
-import { uuid } from 'uuidv4'
-import { plainToClass } from 'class-transformer'
 import { createApp, cleanUpApp } from '../../../app'
 import ConfigService from '../../../shared/domain/config.service'
 import clearContainerInstances from '../../../shared/infra/clearContainerInstances.util'
-import temporaryDatabase from '../../../shared/infra/temporaryDatabase'
+import { plainToClass } from 'class-transformer'
 import ShoppingListItemEntity from '../../../shared/domain/shoppingListItem.entity'
+import temporaryDatabase from '../../../shared/infra/temporaryDatabase'
 
-describe('FetchShoppingListItemV1Controller', () => {
+describe('FinishShoppingListItemV1Controller', () => {
   let server: Server
   let config: ConfigService
 
@@ -29,24 +29,25 @@ describe('FetchShoppingListItemV1Controller', () => {
     await cleanUpApp(server)
   })
 
-  describe('should have a GET /v1/shopping-lists/items/:uuid endpoint that', () => {
-    it('returns a 200 OK with shopping list item', async () => {
+  describe('should have a POST /v1/shopping-lists/items/:uuid/finish endpoint that', () => {
+    it('returns a 204 No Content on success', async () => {
       // Data
       const id = uuid()
-      const data = { uuid: id, title: 'Test' }
-      const item = plainToClass(ShoppingListItemEntity, data)
+      const item = plainToClass(ShoppingListItemEntity, {
+        uuid: id,
+        title: 'Test',
+      })
 
       // Dependencies
       temporaryDatabase.shoppingListItems.set(id, item)
 
       // Execute
-      const response = await request(server)
-        .get(`/v1/shopping-lists/items/${id}`)
-        .expect(HttpStatus.OK)
-        .expect('Content-Type', /json/)
+      await request(server)
+        .post(`/v1/shopping-lists/items/${id}/finish`)
+        .expect(HttpStatus.NO_CONTENT)
 
       // Test
-      expect(response.body?.data).to.deep.equal(data)
+      expect(item.finishedAt).to.be.an.instanceOf(Date)
     })
   })
 })
