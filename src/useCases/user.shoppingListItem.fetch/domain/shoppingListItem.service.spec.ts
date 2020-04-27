@@ -7,7 +7,7 @@ import ShoppingListItemRepository from '../infra/shoppingListItem.repository'
 import ShoppingListItemEntity from './shoppingListItem.entity'
 import clearContainerInstances from '../../dev.test/infra/clearContainerInstances'
 
-describe('ShoppingListItemFetchV1Controller', () => {
+describe('ShoppingListItemService', () => {
   let service: ShoppingListItemService
   let repository: ShoppingListItemRepository
 

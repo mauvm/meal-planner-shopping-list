@@ -16,7 +16,7 @@ class FetchResponseDTO {
 
 @singleton()
 @JsonController('/v1/shopping-lists/items')
-export default class ShoppingListItemFetchV1Controller {
+export default class FetchShoppingListItemV1Controller {
   constructor(private service: ShoppingListItemService) {}
 
   @Get('/:id')

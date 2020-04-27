@@ -3,12 +3,11 @@ import { container } from 'tsyringe'
 import { expect } from 'chai'
 import request from 'supertest'
 import HttpStatus from 'http-status-codes'
-import { uuid } from 'uuidv4'
 import { createApp, cleanUpApp } from '../../../app'
 import ConfigService from '../../dev.config/domain/config.service'
 import clearContainerInstances from '../../dev.test/infra/clearContainerInstances'
 
-describe('FetchShoppingListItemV1Controller', () => {
+describe('CreateShoppingListItemV1Controller', () => {
   let server: Server
   let config: ConfigService
 
@@ -26,21 +25,16 @@ describe('FetchShoppingListItemV1Controller', () => {
     await cleanUpApp(server)
   })
 
-  describe('should have a GET /v1/shopping-lists/items/:id endpoint that', () => {
+  describe('should have a POST /v1/shopping-lists/items endpoint that', () => {
     it('returns a 200 OK with shopping list item', async () => {
-      // Data
-      const id = uuid()
-
       // Execute
       const response = await request(server)
-        .get(`/v1/shopping-lists/items/${id}`)
-        .expect(HttpStatus.OK)
-        .expect('Content-Type', /json/)
+        .post('/v1/shopping-lists/items')
+        .send({ title: 'Test' })
+        .expect(HttpStatus.SEE_OTHER)
 
       // Test
-      expect(response.body?.data).to.be.an('object')
-      expect(response.body.data.id).to.be.a('string').that.is.not.empty
-      expect(response.body.data.title).to.be.a('string').that.is.not.empty
+      expect(response.header.location).to.include('/v1/shopping-lists/items/')
     })
   })
 })
