@@ -5,6 +5,8 @@ import { uuid } from 'uuidv4'
 import ShoppingListItemService from './shoppingListItem.service'
 import ShoppingListItemRepository from '../infra/shoppingListItem.repository'
 import clearContainerInstances from '../../../shared/infra/clearContainerInstances.util'
+import { plainToClass } from 'class-transformer'
+import ShoppingListItemEntity from '../../../shared/domain/shoppingListItem.entity'
 
 describe('ShoppingListItemService', () => {
   let service: ShoppingListItemService
@@ -22,21 +24,18 @@ describe('ShoppingListItemService', () => {
       // Data
       const id = uuid()
       const title = 'Test'
+      let item = plainToClass(ShoppingListItemEntity, { uuid: id, title })
 
       // Dependencies
-      const createUUID = stub(repository, 'createUUID').returns(id)
-      const create = stub(repository, 'create').resolves()
+      const create = stub(repository, 'create').resolves(item)
 
       // Execute
       const promise = service.create({ title })
 
       // Test
-      await expect(promise).to.eventually.equal(id)
-      assert.calledOnce(createUUID)
-      assert.calledOnceWithExactly(create, {
-        id,
-        title,
-      })
+      await expect(promise).to.eventually.be.equal(id)
+      assert.calledOnceWithExactly(create, { title })
+      expect(item.uuid).to.equal(id)
     })
   })
 })

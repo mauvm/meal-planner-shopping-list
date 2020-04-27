@@ -1,13 +1,10 @@
 import { singleton } from 'tsyringe'
-import { plainToClass } from 'class-transformer'
 import ShoppingListItemEntity from '../../../shared/domain/shoppingListItem.entity'
+import temporaryDatabase from '../../../shared/infra/temporaryDatabase'
 
 @singleton()
 export default class ShoppingListItemRepository {
   async findOne(id: string): Promise<ShoppingListItemEntity | undefined> {
-    return plainToClass(ShoppingListItemEntity, {
-      id,
-      title: 'Vegetarisch gehakt',
-    })
+    return temporaryDatabase.shoppingListItems.get(id)
   }
 }

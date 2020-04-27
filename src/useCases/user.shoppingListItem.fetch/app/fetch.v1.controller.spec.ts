@@ -4,9 +4,12 @@ import { expect } from 'chai'
 import request from 'supertest'
 import HttpStatus from 'http-status-codes'
 import { uuid } from 'uuidv4'
+import { plainToClass } from 'class-transformer'
 import { createApp, cleanUpApp } from '../../../app'
 import ConfigService from '../../../shared/domain/config.service'
 import clearContainerInstances from '../../../shared/infra/clearContainerInstances.util'
+import temporaryDatabase from '../../../shared/infra/temporaryDatabase'
+import ShoppingListItemEntity from '../../../shared/domain/shoppingListItem.entity'
 
 describe('FetchShoppingListItemV1Controller', () => {
   let server: Server
@@ -30,6 +33,11 @@ describe('FetchShoppingListItemV1Controller', () => {
     it('returns a 200 OK with shopping list item', async () => {
       // Data
       const id = uuid()
+      const data = { uuid: id, title: 'Test' }
+      const item = plainToClass(ShoppingListItemEntity, data)
+
+      // Dependencies
+      temporaryDatabase.shoppingListItems.set(id, item)
 
       // Execute
       const response = await request(server)
@@ -38,9 +46,7 @@ describe('FetchShoppingListItemV1Controller', () => {
         .expect('Content-Type', /json/)
 
       // Test
-      expect(response.body?.data).to.be.an('object')
-      expect(response.body.data.id).to.be.a('string').that.is.not.empty
-      expect(response.body.data.title).to.be.a('string').that.is.not.empty
+      expect(response.body?.data).to.deep.equal(data)
     })
   })
 })

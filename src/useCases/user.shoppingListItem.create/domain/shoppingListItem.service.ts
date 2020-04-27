@@ -5,14 +5,8 @@ import ShoppingListItemRepository from '../infra/shoppingListItem.repository'
 export default class ShoppingListItemService {
   constructor(private repository: ShoppingListItemRepository) {}
 
-  async create(requestBody: { title: string }): Promise<string> {
-    const data = {
-      id: this.repository.createUUID(),
-      title: requestBody.title,
-    }
-
-    await this.repository.create(data)
-
-    return data.id
+  async create(data: { title: string }): Promise<string> {
+    const item = await this.repository.create(data)
+    return item.uuid
   }
 }

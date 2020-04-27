@@ -26,7 +26,7 @@ describe('CreateShoppingListItemV1Controller', () => {
   })
 
   describe('should have a POST /v1/shopping-lists/items endpoint that', () => {
-    it('returns a 200 OK with shopping list item', async () => {
+    it('returns a 303 See Other with location header containing the UUID', async () => {
       // Execute
       const response = await request(server)
         .post('/v1/shopping-lists/items')
