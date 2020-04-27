@@ -11,13 +11,12 @@
     "start": "node build/server.js",
     "dev": "nodemon --config nodemon.json",
     "lint": "eslint . --ext .ts,.tsx",
-    "test:build": "rimraf .test/build/ && tsc --build tsconfig.test.json",
-    "test": "mocha",
+    "test": "rimraf .test/build/ && tsc --build tsconfig.test.json && mocha",
     "test:dev": "nodemon --config nodemon.test.json"
   },
   "husky": {
     "hooks": {
-      "pre-commit": "yarn lint && yarn test:build && yarn test"
+      "pre-commit": "yarn lint && yarn test"
     }
   },
   "dependencies": {

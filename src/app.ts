@@ -12,7 +12,7 @@ function debugRegisteredControllers(prefix: string) {
   const logger = container.resolve(LoggerService)
 
   for (const { target, route } of getMetadataArgsStorage().controllers) {
-    logger.debug(`Found registered controller ${target.name}`, {
+    logger.debug(`Found registered controller: ${target.name}`, {
       controller: target.name,
       route: `${prefix}${route}`,
     })

@@ -1,6 +1,6 @@
 {
   "watch": ["src/**/*.spec.ts"],
   "ext": "ts,json",
-  "exec": "yarn test:build && yarn test --watch",
+  "exec": "yarn test --watch",
   "delay": 2000
 }
