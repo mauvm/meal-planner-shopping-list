@@ -5,8 +5,8 @@ import request from 'supertest'
 import HttpStatus from 'http-status-codes'
 import { uuid } from 'uuidv4'
 import { createApp, cleanUpApp } from '../../../app'
-import ConfigService from '../../dev.config/domain/config.service'
-import clearContainerInstances from '../../dev.test/infra/clearContainerInstances'
+import ConfigService from '../../../shared/domain/config.service'
+import clearContainerInstances from '../../../shared/infra/clearContainerInstances.util'
 
 describe('FetchShoppingListItemV1Controller', () => {
   let server: Server

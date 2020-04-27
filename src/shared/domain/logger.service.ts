@@ -3,7 +3,7 @@ import winston from 'winston'
 import { SPLAT } from 'triple-beam'
 import YAML from 'yaml'
 import { highlight } from 'cli-highlight'
-import ConfigService from '../../dev.config/domain/config.service'
+import ConfigService from './config.service'
 
 @singleton()
 export default class LoggerService {

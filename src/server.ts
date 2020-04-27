@@ -1,7 +1,7 @@
 import 'reflect-metadata'
 import { container } from 'tsyringe'
 import { createApp } from './app'
-import LoggerService from './useCases/dev.log/domain/logger.service'
+import LoggerService from './shared/domain/logger.service'
 
 async function run() {
   try {

@@ -5,7 +5,7 @@ import { uuid } from 'uuidv4'
 import ShoppingListItemService from './shoppingListItem.service'
 import ShoppingListItemRepository from '../infra/shoppingListItem.repository'
 import ShoppingListItemEntity from './shoppingListItem.entity'
-import clearContainerInstances from '../../dev.test/infra/clearContainerInstances'
+import clearContainerInstances from '../../../shared/infra/clearContainerInstances.util'
 
 describe('ShoppingListItemService', () => {
   let service: ShoppingListItemService
