@@ -10,6 +10,7 @@ export default class ShoppingListItemRepository {
     const item = plainToClass(ShoppingListItemEntity, data)
 
     item.uuid = uuid()
+    item.createdAt = new Date()
     temporaryDatabase.shoppingListItems.set(item.uuid, item)
 
     return item

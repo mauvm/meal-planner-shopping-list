@@ -16,6 +16,10 @@ export default class ShoppingListItemEntity {
   @IsString()
   title: string
 
+  @IsNotEmpty()
+  @IsDate()
+  createdAt: Date
+
   @IsOptional()
   @IsDate()
   finishedAt?: Date
