@@ -1,5 +1,5 @@
 import { singleton } from 'tsyringe'
-import ShoppingListItemEntity from './shoppingListItem.entity'
+import ShoppingListItemEntity from '../../../shared/domain/shoppingListItem.entity'
 import ShoppingListItemRepository from '../infra/shoppingListItem.repository'
 
 @singleton()

@@ -3,7 +3,7 @@ import { JsonController, Get, Params } from 'routing-controllers'
 import { IsUUID } from 'class-validator'
 import { plainToClass } from 'class-transformer'
 import ShoppingListItemService from '../domain/shoppingListItem.service'
-import ShoppingListItemEntity from '../domain/shoppingListItem.entity'
+import ShoppingListItemEntity from '../../../shared/domain/shoppingListItem.entity'
 
 class FetchRequestParamsDTO {
   @IsUUID()
