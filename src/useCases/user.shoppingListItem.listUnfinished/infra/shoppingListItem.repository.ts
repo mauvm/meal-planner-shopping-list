@@ -5,6 +5,8 @@ import temporaryDatabase from '../../../shared/infra/temporaryDatabase'
 @singleton()
 export default class ShoppingListItemRepository {
   async findAllUnfinished(): Promise<ShoppingListItemEntity[]> {
-    return Array.from(temporaryDatabase.shoppingListItems.values())
+    return Array.from(temporaryDatabase.shoppingListItems.values()).filter(
+      (item) => !item.finishedAt,
+    )
   }
 }
