@@ -11,7 +11,9 @@ COPY . /data
 RUN yarn install \
   && yarn build \
   # Clean up source code
-  && rm -r /data/src/
+  && rm -r /data/src/ \
+  # Clean up dependencies
+  && yarn install --production --ignore-scripts --prefer-offline
 
 EXPOSE 3000
 CMD yarn start
