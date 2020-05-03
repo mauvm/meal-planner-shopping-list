@@ -11,6 +11,10 @@ export default class EventMockStore extends EventStore {
   async init() {}
   async cleanUp() {}
 
+  /**
+   * This mock EventStore simply replays the persisted events
+   * to the listeners that are registered via `catchUpStream()`.
+   */
   async persistEvent(streamName: string, event: Event) {
     const listeners = this.streamListeners.get(streamName)
 

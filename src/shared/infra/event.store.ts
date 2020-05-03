@@ -37,6 +37,7 @@ export default class EventStore implements AutoLoadableStore {
   constructor(private logger: LoggerService) {}
 
   async init() {
+    // @todo Improve authentication
     const username = 'admin'
     const password = 'changeit'
     const host = process.env.EVENT_STORE_SERVICE_SERVICE_HOST || 'localhost'
@@ -123,7 +124,6 @@ export default class EventStore implements AutoLoadableStore {
       }
 
       const observedEvent = new eventClass(id, data)
-
       callback(observedEvent)
     })
   }
