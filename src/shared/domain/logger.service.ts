@@ -38,19 +38,19 @@ export default class LoggerService {
     )
   }
 
-  debug(message: string, meta?: { [key: string]: any }): void {
+  debug(message: string, meta?: object): void {
     this.logger.debug(message, meta)
   }
 
-  info(message: string, meta?: { [key: string]: any }): void {
+  info(message: string, meta?: object): void {
     this.logger.info(message, meta)
   }
 
-  warn(message: string, meta?: { [key: string]: any }): void {
+  warn(message: string, meta?: object): void {
     this.logger.warn(message, meta)
   }
 
-  error(message: string, meta?: { [key: string]: any }): void {
+  error(message: string, meta?: object): void {
     this.logger.error(message, meta)
   }
 }

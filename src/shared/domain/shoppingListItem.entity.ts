@@ -10,7 +10,7 @@ import {
 @injectable()
 export default class ShoppingListItemEntity {
   @IsUUID()
-  uuid: string
+  id: string
 
   @IsNotEmpty()
   @IsString()

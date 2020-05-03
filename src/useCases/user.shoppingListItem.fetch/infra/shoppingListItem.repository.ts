@@ -1,10 +1,23 @@
 import { singleton } from 'tsyringe'
 import ShoppingListItemEntity from '../../../shared/domain/shoppingListItem.entity'
-import temporaryDatabase from '../../../shared/infra/temporaryDatabase'
+import ShoppingListItemStore from '../../../shared/infra/shoppingListItem.store'
+import { plainToClass } from 'class-transformer'
 
 @singleton()
 export default class ShoppingListItemRepository {
+  constructor(private shoppingListItemStore: ShoppingListItemStore) {}
+
   async findOne(id: string): Promise<ShoppingListItemEntity | undefined> {
-    return temporaryDatabase.shoppingListItems.get(id)
+    const aggregate = this.shoppingListItemStore.getAggregateById(id)
+
+    if (!aggregate) {
+      return undefined
+    }
+
+    const item = plainToClass(ShoppingListItemEntity, aggregate.data)
+
+    // @todo Validate instance
+
+    return item
   }
 }

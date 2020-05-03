@@ -7,7 +7,7 @@ import ShoppingListItemEntity from '../../../shared/domain/shoppingListItem.enti
 
 class FetchRequestParamsDTO {
   @IsUUID()
-  uuid: string
+  id: string
 }
 
 class FetchResponseDTO {
@@ -19,11 +19,11 @@ class FetchResponseDTO {
 export default class FetchShoppingListItemV1Controller {
   constructor(private service: ShoppingListItemService) {}
 
-  @Get('/:uuid')
+  @Get('/:id')
   async fetch(
-    @Params() { uuid }: FetchRequestParamsDTO,
+    @Params() { id }: FetchRequestParamsDTO,
   ): Promise<FetchResponseDTO> {
-    const item = await this.service.findOneByIdOrFail(uuid)
+    const item = await this.service.findOneByIdOrFail(id)
 
     return plainToClass(FetchResponseDTO, { data: item })
   }

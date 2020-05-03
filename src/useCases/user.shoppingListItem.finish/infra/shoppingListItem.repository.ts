@@ -1,15 +1,23 @@
 import { singleton } from 'tsyringe'
-import temporaryDatabase from '../../../shared/infra/temporaryDatabase'
+import ShoppingListItemFinished from '../domain/shoppingListItemFinished.event'
+import EventStore from '../../../shared/infra/event.store'
+import ShoppingListItemStore from '../../../shared/infra/shoppingListItem.store'
+import ShoppingListItemCreated from '../../user.shoppingListItem.create/domain/shoppingListItemCreated.event'
 
 @singleton()
 export default class ShoppingListItemRepository {
-  async finish(uuid: string): Promise<void> {
-    const item = temporaryDatabase.shoppingListItems.get(uuid)
+  constructor(
+    private shoppingListItemStore: ShoppingListItemStore,
+    private eventStore: EventStore,
+  ) {}
 
-    if (!item) {
-      throw new Error(`No shopping list item with ID "${uuid}"`)
-    }
+  async finish(id: string): Promise<void> {
+    this.shoppingListItemStore.assertObservedEvent(id, ShoppingListItemCreated)
 
-    item.finishedAt = new Date()
+    const event = new ShoppingListItemFinished(id, {
+      finishedAt: new Date().toISOString(),
+    })
+
+    await this.eventStore.persistEvent('shopping-list-items', event)
   }
 }

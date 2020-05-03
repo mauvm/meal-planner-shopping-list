@@ -12,10 +12,10 @@ async function run() {
     await new Promise((resolve) => app.listen(port, resolve))
 
     const logger = container.resolve(LoggerService)
-    logger.info(`Listening on port ${port}..`, { port })
+    logger.info(`Listening on port ${port}`, { port })
   } catch (err) {
     const logger = container.resolve(LoggerService)
-    logger.error('Uncaught error:', err)
+    logger.error(`Uncaught error: ${err.message}`, { stack: err.stack })
 
     process.exit(1)
   }

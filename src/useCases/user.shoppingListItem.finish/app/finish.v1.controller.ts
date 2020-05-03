@@ -6,16 +6,17 @@ import ShoppingListItemService from '../domain/shoppingListItem.service'
 
 class FinishRequestParamsDTO {
   @IsUUID()
-  uuid: string
+  id: string
 }
+
 @singleton()
 @JsonController('/v1/shopping-lists/items')
 export default class CreateShoppingListItemV1Controller {
   constructor(private service: ShoppingListItemService) {}
 
-  @Post('/:uuid/finish')
+  @Post('/:id/finish')
   @OnUndefined(HttpStatus.NO_CONTENT)
-  async fetch(@Params() { uuid }: FinishRequestParamsDTO): Promise<void> {
-    await this.service.finish(uuid)
+  async fetch(@Params() { id }: FinishRequestParamsDTO): Promise<void> {
+    await this.service.finish(id)
   }
 }

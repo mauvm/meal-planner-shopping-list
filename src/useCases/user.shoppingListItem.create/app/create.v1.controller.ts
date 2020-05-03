@@ -22,11 +22,11 @@ export default class CreateShoppingListItemV1Controller {
   constructor(private service: ShoppingListItemService) {}
 
   @Post('/')
-  @Redirect('/v1/shopping-lists/items/:uuid')
+  @Redirect('/v1/shopping-lists/items/:id')
   @HttpCode(HttpStatus.SEE_OTHER)
-  async fetch(@Body() data: CreateRequestParamsDTO): Promise<{ uuid: string }> {
-    const uuid = await this.service.create(data)
+  async fetch(@Body() data: CreateRequestParamsDTO): Promise<{ id: string }> {
+    const id = await this.service.create(data)
 
-    return { uuid }
+    return { id }
   }
 }

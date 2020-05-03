@@ -20,14 +20,14 @@ describe('ShoppingListItemService', () => {
   })
 
   describe('should have a "create" method that', () => {
-    it('resolves to an UUID for the created shopping list item', async () => {
+    it('resolves to an ID for the created shopping list item', async () => {
       // Data
       const id = uuid()
       const title = 'Test'
-      let item = plainToClass(ShoppingListItemEntity, { uuid: id, title })
+      let item = plainToClass(ShoppingListItemEntity, { id, title })
 
       // Dependencies
-      const create = stub(repository, 'create').resolves(item)
+      const create = stub(repository, 'create').resolves(id)
 
       // Execute
       const promise = service.create({ title })
@@ -35,7 +35,7 @@ describe('ShoppingListItemService', () => {
       // Test
       await expect(promise).to.eventually.be.equal(id)
       assert.calledOnceWithExactly(create, { title })
-      expect(item.uuid).to.equal(id)
+      expect(item.id).to.equal(id)
     })
   })
 })

@@ -5,7 +5,7 @@ import ShoppingListItemRepository from '../infra/shoppingListItem.repository'
 export default class ShoppingListItemService {
   constructor(private repository: ShoppingListItemRepository) {}
 
-  async finish(uuid: string): Promise<void> {
-    await this.repository.finish(uuid)
+  async finish(id: string): Promise<void> {
+    await this.repository.finish(id)
   }
 }

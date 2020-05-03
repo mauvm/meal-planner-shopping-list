@@ -18,7 +18,7 @@ describe('ShoppingListItemService', () => {
   })
 
   describe('should have a "finish" method that', () => {
-    it('resolves to an UUID for the finished shopping list item', async () => {
+    it('resolves to an ID for the finished shopping list item', async () => {
       // Data
       const id = uuid()
 

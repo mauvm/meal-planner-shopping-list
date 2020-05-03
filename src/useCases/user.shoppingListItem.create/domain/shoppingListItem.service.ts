@@ -6,7 +6,6 @@ export default class ShoppingListItemService {
   constructor(private repository: ShoppingListItemRepository) {}
 
   async create(data: { title: string }): Promise<string> {
-    const item = await this.repository.create(data)
-    return item.uuid
+    return this.repository.create(data)
   }
 }

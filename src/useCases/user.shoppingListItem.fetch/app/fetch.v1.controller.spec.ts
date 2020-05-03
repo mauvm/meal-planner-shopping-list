@@ -4,22 +4,27 @@ import { expect } from 'chai'
 import request from 'supertest'
 import HttpStatus from 'http-status-codes'
 import { uuid } from 'uuidv4'
-import { plainToClass } from 'class-transformer'
 import { createApp, cleanUpApp } from '../../../app'
 import ConfigService from '../../../shared/domain/config.service'
 import clearContainerInstances from '../../../shared/infra/clearContainerInstances.util'
-import temporaryDatabase from '../../../shared/infra/temporaryDatabase'
-import ShoppingListItemEntity from '../../../shared/domain/shoppingListItem.entity'
+import ShoppingListItemStore from '../../../shared/infra/shoppingListItem.store'
+import ShoppingListItemCreated from '../../user.shoppingListItem.create/domain/shoppingListItemCreated.event'
+import EventMockStore from '../../../shared/infra/event.store.mock'
+import EventStore from '../../../shared/infra/event.store'
 
 describe('FetchShoppingListItemV1Controller', () => {
   let server: Server
   let config: ConfigService
+  let eventStore: EventStore
 
   beforeEach(async () => {
     clearContainerInstances(container)
 
     config = container.resolve(ConfigService)
     config.set('logger.level', 'warn')
+
+    eventStore = container.resolve(EventMockStore)
+    container.registerInstance(EventStore, eventStore)
 
     const app = await createApp()
     server = app.listen()
@@ -29,15 +34,16 @@ describe('FetchShoppingListItemV1Controller', () => {
     await cleanUpApp(server)
   })
 
-  describe('should have a GET /v1/shopping-lists/items/:uuid endpoint that', () => {
+  describe('should have a GET /v1/shopping-lists/items/:id endpoint that', () => {
     it('returns a 200 OK with shopping list item', async () => {
       // Data
       const id = uuid()
-      const data = { uuid: id, title: 'Test' }
-      const item = plainToClass(ShoppingListItemEntity, data)
+      const data = { title: 'Test' }
+      const createdEvent = new ShoppingListItemCreated(id, data)
 
       // Dependencies
-      temporaryDatabase.shoppingListItems.set(id, item)
+      const shoppingListItemStore = container.resolve(ShoppingListItemStore)
+      shoppingListItemStore.handleEvent(createdEvent)
 
       // Execute
       const response = await request(server)
@@ -46,7 +52,10 @@ describe('FetchShoppingListItemV1Controller', () => {
         .expect('Content-Type', /json/)
 
       // Test
-      expect(response.body?.data).to.deep.equal(data)
+      const item = response.body?.data
+      expect(item?.id).to.equal(id)
+      expect(item?.title).to.equal(data.title)
+      expect(item?.title).to.be.a('string').that.is.not.empty
     })
   })
 })

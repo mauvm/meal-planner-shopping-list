@@ -1,18 +1,21 @@
 import { singleton } from 'tsyringe'
-import { plainToClass } from 'class-transformer'
 import { uuid } from 'uuidv4'
-import ShoppingListItemEntity from '../../../shared/domain/shoppingListItem.entity'
-import temporaryDatabase from '../../../shared/infra/temporaryDatabase'
+import ShoppingListItemCreated from '../domain/shoppingListItemCreated.event'
+import EventStore from '../../../shared/infra/event.store'
 
 @singleton()
 export default class ShoppingListItemRepository {
-  async create(data: { title: string }): Promise<ShoppingListItemEntity> {
-    const item = plainToClass(ShoppingListItemEntity, data)
+  constructor(private eventStore: EventStore) {}
 
-    item.uuid = uuid()
-    item.createdAt = new Date()
-    temporaryDatabase.shoppingListItems.set(item.uuid, item)
+  async create(data: { title: string }): Promise<string> {
+    const id = uuid()
+    const event = new ShoppingListItemCreated(id, data)
 
-    return item
+    // @todo Assert that aggregate ID is not in use
+
+    // @todo Move stream name to ShoppingListItemStore (also other occurences outside of the store)
+    await this.eventStore.persistEvent('shopping-list-items', event)
+
+    return id
   }
 }
