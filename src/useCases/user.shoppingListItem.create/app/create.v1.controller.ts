@@ -5,10 +5,12 @@ import {
   Body,
   Redirect,
   HttpCode,
+  Res,
 } from 'routing-controllers'
 import { IsNotEmpty, IsString } from 'class-validator'
 import HttpStatus from 'http-status-codes'
 import ShoppingListItemService from '../domain/shoppingListItem.service'
+import { Response } from 'koa'
 
 class CreateRequestParamsDTO {
   @IsNotEmpty()
@@ -24,8 +26,13 @@ export default class CreateShoppingListItemV1Controller {
   @Post('/')
   @Redirect('/v1/shopping-lists/items/:id')
   @HttpCode(HttpStatus.SEE_OTHER)
-  async fetch(@Body() data: CreateRequestParamsDTO): Promise<{ id: string }> {
+  async fetch(
+    @Body() data: CreateRequestParamsDTO,
+    @Res() res: Response,
+  ): Promise<{ id: string }> {
     const id = await this.service.create(data)
+
+    res.set('X-Resource-Id', id)
 
     return { id }
   }

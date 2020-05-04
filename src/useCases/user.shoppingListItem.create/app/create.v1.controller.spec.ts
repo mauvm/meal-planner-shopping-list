@@ -46,10 +46,7 @@ describe('CreateShoppingListItemV1Controller', () => {
 
       // Test
       expect(response.header.location).to.include('/v1/shopping-lists/items/')
-
-      const id = response.header.location.substr(
-        response.header.location.lastIndexOf('/') + 1,
-      )
+      const id = response.header['x-resource-id']
       expect(shoppingListItemStore.getAggregateById(id)?.data?.title).to.equal(
         'Test',
       )

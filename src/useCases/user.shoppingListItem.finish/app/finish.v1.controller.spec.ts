@@ -41,9 +41,7 @@ describe('FinishShoppingListItemV1Controller', () => {
         .post('/v1/shopping-lists/items')
         .send({ title: 'Test' })
         .expect(HttpStatus.SEE_OTHER)
-      const id = response.header.location.substr(
-        response.header.location.lastIndexOf('/') + 1,
-      )
+      const id = response.header['x-resource-id']
 
       // Execute
       await request(server)
