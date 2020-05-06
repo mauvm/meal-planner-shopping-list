@@ -26,7 +26,7 @@ export default class ShoppingListItemStore implements AutoLoadableStore {
   async cleanUp() {}
 
   handleEvent(event: Event) {
-    const aggregate = this.aggregates.get(event.id) || {
+    const aggregate = this.aggregates.get(event.aggregateId) || {
       data: {},
       events: [],
     }
@@ -34,30 +34,30 @@ export default class ShoppingListItemStore implements AutoLoadableStore {
     event.applyTo(aggregate.data)
     aggregate.events.push(event)
 
-    this.aggregates.set(event.id, aggregate)
+    this.aggregates.set(event.aggregateId, aggregate)
   }
 
-  getAggregateById(id: string): any | undefined {
-    return this.aggregates.get(id)
+  getAggregateById(aggregateId: string): any | undefined {
+    return this.aggregates.get(aggregateId)
   }
 
   getAggregates(): Map<string, Aggregate> {
     return this.aggregates
   }
 
-  assertObservedEvent(id: string, eventClass: typeof Event): void {
-    const aggregate = this.aggregates.get(id)
+  assertObservedEvent(aggregateId: string, eventClass: typeof Event): void {
+    const aggregate = this.aggregates.get(aggregateId)
 
     if (!aggregate) {
       throw new AssertionError({
-        message: `No events observed for ID "${id}"!`,
+        message: `No events observed for aggregate ID "${aggregateId}"!`,
         expected: eventClass.name,
       })
     }
 
     if (!aggregate.events.some((event) => event instanceof eventClass)) {
       throw new AssertionError({
-        message: `Event not observed for ID "${id}"!`,
+        message: `Event not observed for aggregate ID "${aggregateId}"!`,
         expected: eventClass.name,
       })
     }

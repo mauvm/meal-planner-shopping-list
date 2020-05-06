@@ -11,10 +11,13 @@ export default class ShoppingListItemRepository {
     private eventStore: EventStore,
   ) {}
 
-  async finish(id: string): Promise<void> {
-    this.shoppingListItemStore.assertObservedEvent(id, ShoppingListItemCreated)
+  async finish(aggregateId: string): Promise<void> {
+    this.shoppingListItemStore.assertObservedEvent(
+      aggregateId,
+      ShoppingListItemCreated,
+    )
 
-    const event = new ShoppingListItemFinished(id, {
+    const event = new ShoppingListItemFinished(null, aggregateId, {
       finishedAt: new Date().toISOString(),
     })
 

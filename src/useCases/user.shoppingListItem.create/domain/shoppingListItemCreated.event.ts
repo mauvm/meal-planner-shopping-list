@@ -6,9 +6,14 @@ export default class ShoppingListItemCreated extends Event {
 
   readonly data: { id: string; title: string; createdAt: string }
 
-  constructor(readonly id: string, data: { title: string }) {
-    super(id, data)
-    this.data = { id, ...data, createdAt: new Date().toISOString() }
+  constructor(
+    readonly eventId: string | null,
+    readonly aggregateId: string,
+    data: { title: string },
+  ) {
+    super(eventId, aggregateId, data)
+
+    this.data.createdAt = new Date().toISOString()
   }
 
   applyTo(aggregate: any): void {

@@ -37,9 +37,9 @@ describe('FetchShoppingListItemV1Controller', () => {
   describe('should have a GET /v1/shopping-lists/items/:id endpoint that', () => {
     it('returns a 200 OK with shopping list item', async () => {
       // Data
-      const id = uuid()
+      const aggregateId = uuid()
       const data = { title: 'Test' }
-      const createdEvent = new ShoppingListItemCreated(id, data)
+      const createdEvent = new ShoppingListItemCreated(null, aggregateId, data)
 
       // Dependencies
       const shoppingListItemStore = container.resolve(ShoppingListItemStore)
@@ -47,15 +47,14 @@ describe('FetchShoppingListItemV1Controller', () => {
 
       // Execute
       const response = await request(server)
-        .get(`/v1/shopping-lists/items/${id}`)
+        .get(`/v1/shopping-lists/items/${aggregateId}`)
         .expect(HttpStatus.OK)
         .expect('Content-Type', /json/)
 
       // Test
       const item = response.body?.data
-      expect(item?.id).to.equal(id)
+      expect(item?.id).to.equal(aggregateId)
       expect(item?.title).to.equal(data.title)
-      expect(item?.title).to.be.a('string').that.is.not.empty
     })
   })
 })

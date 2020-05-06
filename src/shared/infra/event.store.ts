@@ -15,7 +15,13 @@ export class Event {
   // @todo Remove this by determining class constructor from instance and then get static type
   readonly type: string // Add: readonly type = MyEventClass.type
 
-  constructor(readonly id: string, readonly data: object) {}
+  constructor(
+    readonly eventId: string | null,
+    readonly aggregateId: string,
+    readonly data: any = {},
+  ) {
+    this.data.id = aggregateId
+  }
 
   applyTo(data: any): void {
     Object.assign(data, this.data)
@@ -83,7 +89,14 @@ export default class EventStore implements AutoLoadableStore {
     this.logger.debug(`Appending ${streamName}:${eventToStore.type} event..`, {
       streamName,
       event,
-      eventToStore,
+      eventToStore: {
+        eventId: eventToStore.eventId,
+        type: eventToStore.type,
+        isJSON: eventToStore.isJson,
+        // Log as base64 instead of byte array (Buffer)
+        dataBase64: eventToStore.data.toString('base64'),
+        metadataBase64: eventToStore.metadata.toString('base64'),
+      },
     })
 
     const writeResult = await this.client.appendToStream(
@@ -105,7 +118,7 @@ export default class EventStore implements AutoLoadableStore {
         return
       }
 
-      const id = event!.event!.eventId
+      const eventId = event!.event!.eventId
       const type = String(event!.event!.eventType)
       const data = JSON.parse(event!.event!.data!.toString('utf8'))
 
@@ -116,14 +129,14 @@ export default class EventStore implements AutoLoadableStore {
       if (!eventClass) {
         this.logger.error(`No event handler for "${type}"`, {
           streamName,
-          id,
+          eventId,
           type,
           data,
         })
         return
       }
 
-      const observedEvent = new eventClass(id, data)
+      const observedEvent = new eventClass(eventId, data.id, data)
       callback(observedEvent)
     })
   }

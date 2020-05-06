@@ -10,7 +10,7 @@ export default class ShoppingListItemRepository {
   async findAllUnfinished(): Promise<ShoppingListItemEntity[]> {
     const aggregates = Array.from(
       this.shoppingListItemStore.getAggregates().values(),
-    ).filter((item: any) => !item.finishedAt)
+    ).filter((item: any) => !item.data.finishedAt)
 
     return aggregates.map((aggregate) =>
       plainToClass(ShoppingListItemEntity, aggregate.data),

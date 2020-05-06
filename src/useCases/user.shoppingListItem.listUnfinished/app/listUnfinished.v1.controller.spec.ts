@@ -9,6 +9,7 @@ import ConfigService from '../../../shared/domain/config.service'
 import clearContainerInstances from '../../../shared/infra/clearContainerInstances.util'
 import ShoppingListItemStore from '../../../shared/infra/shoppingListItem.store'
 import ShoppingListItemCreated from '../../user.shoppingListItem.create/domain/shoppingListItemCreated.event'
+import ShoppingListItemFinished from '../../user.shoppingListItem.finish/domain/shoppingListItemFinished.event'
 import EventMockStore from '../../../shared/infra/event.store.mock'
 import EventStore from '../../../shared/infra/event.store'
 
@@ -37,17 +38,28 @@ describe('ListUnfinishedShoppingListItemV1Controller', () => {
   describe('should have a GET /v1/shopping-lists/unfinished-items endpoint that', () => {
     it('returns a 200 OK with unfinished shopping list items', async () => {
       // Data
-      const id1 = uuid()
-      const id2 = uuid()
-      const event1 = new ShoppingListItemCreated(id1, { title: 'Item 1' })
+      const aggregateId1 = uuid()
+      const aggregateId2 = uuid()
+      const aggregateId3 = uuid()
+      const createEvent1 = new ShoppingListItemCreated(null, aggregateId1, {
+        title: 'Item 1',
+      })
+      const createEvent2 = new ShoppingListItemCreated(null, aggregateId2, {
+        title: 'Item 2',
+      })
+      const finishEvent = new ShoppingListItemFinished(null, aggregateId2)
 
       await new Promise((resolve) => setTimeout(resolve, 10)) // event2 must be after event1
-      const event2 = new ShoppingListItemCreated(id2, { title: 'Item 2' })
+      const createEvent3 = new ShoppingListItemCreated(null, aggregateId3, {
+        title: 'Item 3',
+      })
 
       // Dependencies
       const shoppingListItemStore = container.resolve(ShoppingListItemStore)
-      shoppingListItemStore.handleEvent(event1)
-      shoppingListItemStore.handleEvent(event2)
+      shoppingListItemStore.handleEvent(createEvent1)
+      shoppingListItemStore.handleEvent(createEvent2)
+      shoppingListItemStore.handleEvent(finishEvent)
+      shoppingListItemStore.handleEvent(createEvent3)
 
       // Execute
       const response = await request(server)
@@ -58,8 +70,8 @@ describe('ListUnfinishedShoppingListItemV1Controller', () => {
       // Test
       expect(response.body?.data).to.be.an('array').with.length(2)
       expect(response.body?.data.map((item: any) => item.id)).to.deep.equal([
-        id2,
-        id1,
+        aggregateId3,
+        aggregateId1,
       ])
     })
   })

@@ -8,14 +8,14 @@ export default class ShoppingListItemRepository {
   constructor(private eventStore: EventStore) {}
 
   async create(data: { title: string }): Promise<string> {
-    const id = uuid()
-    const event = new ShoppingListItemCreated(id, data)
+    const aggregateId = uuid()
+    const event = new ShoppingListItemCreated(null, aggregateId, data)
 
     // @todo Assert that aggregate ID is not in use
 
     // @todo Move stream name to ShoppingListItemStore (also other occurences outside of the store)
     await this.eventStore.persistEvent('shopping-list-items', event)
 
-    return id
+    return aggregateId
   }
 }
