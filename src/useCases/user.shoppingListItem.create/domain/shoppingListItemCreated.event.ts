@@ -1,7 +1,7 @@
 import { Event } from '../../../shared/infra/event.store'
 
 export default class ShoppingListItemCreated extends Event {
-  static readonly type = 'shoppingListItemCreated'
+  static readonly type = 'shopping-list-item-created'
   readonly type = ShoppingListItemCreated.type
 
   readonly data: { id: string; title: string; createdAt: string }
