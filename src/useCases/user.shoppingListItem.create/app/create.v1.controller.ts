@@ -7,7 +7,7 @@ import {
   HttpCode,
   Res,
 } from 'routing-controllers'
-import { IsNotEmpty, IsString } from 'class-validator'
+import { IsNotEmpty, IsString, MaxLength } from 'class-validator'
 import HttpStatus from 'http-status-codes'
 import ShoppingListItemService from '../domain/shoppingListItem.service'
 import { Response } from 'koa'
@@ -15,6 +15,7 @@ import { Response } from 'koa'
 class CreateRequestParamsDTO {
   @IsNotEmpty()
   @IsString()
+  @MaxLength(300)
   title: string
 }
 

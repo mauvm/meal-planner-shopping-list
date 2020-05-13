@@ -34,6 +34,24 @@ describe('CreateShoppingListItemV1Controller', () => {
   })
 
   describe('should have a POST /v1/shopping-lists/items endpoint that', () => {
+    it('returns a 400 Bad Request on a title that is too long (over 300 characters)', async () => {
+      // Data
+      const tooLongTitle = Array(301).fill('a').join('')
+
+      // Execute
+      const response = await request(server)
+        .post('/v1/shopping-lists/items')
+        .send({ title: tooLongTitle })
+        .expect(HttpStatus.BAD_REQUEST)
+
+      // Test
+      const constraint = response.body?.errors?.[0]
+      expect(constraint.property).to.equal('title')
+      expect(constraint.constraints).to.deep.equal({
+        maxLength: 'title must be shorter than or equal to 300 characters',
+      })
+    })
+
     it('returns a 303 See Other with location header containing the ID', async () => {
       // Dependencies
       const shoppingListItemStore = container.resolve(ShoppingListItemStore)
