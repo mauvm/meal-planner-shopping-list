@@ -6,7 +6,6 @@ import request from 'supertest'
 import HttpStatus from 'http-status-codes'
 import { createApp, cleanUpApp } from '../../../app'
 import ConfigService from '../../../shared/domain/config.service'
-import clearContainerInstances from '../../../shared/infra/clearContainerInstances.util'
 import ShoppingListItemStore from '../../../shared/infra/shoppingListItem.store'
 import EventStore from '../../../shared/infra/event.store'
 import EventMockStore from '../../../shared/infra/event.store.mock'
@@ -17,7 +16,7 @@ describe('CreateShoppingListItemV1Controller', () => {
   let eventStore: EventStore
 
   beforeEach(async () => {
-    clearContainerInstances(container)
+    container.clearInstances()
 
     config = container.resolve(ConfigService)
     config.set('logger.level', 'warn')

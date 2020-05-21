@@ -9,7 +9,6 @@ import ConfigService from '../../../shared/domain/config.service'
 import EventStore from '../../../shared/infra/event.store'
 import EventMockStore from '../../../shared/infra/event.store.mock'
 import ShoppingListItemStore from '../../../shared/infra/shoppingListItem.store'
-import clearContainerInstances from '../../../shared/infra/clearContainerInstances.util'
 
 describe('FinishShoppingListItemV1Controller', () => {
   let server: Server
@@ -17,7 +16,7 @@ describe('FinishShoppingListItemV1Controller', () => {
   let eventStore: EventStore
 
   beforeEach(async () => {
-    clearContainerInstances(container)
+    container.clearInstances()
 
     config = container.resolve(ConfigService)
     config.set('logger.level', 'warn')

@@ -11,7 +11,7 @@ class FinishRequestParamsDTO {
 
 @singleton()
 @JsonController('/v1/shopping-lists/items')
-export default class CreateShoppingListItemV1Controller {
+export default class FinishShoppingListItemV1Controller {
   constructor(private service: ShoppingListItemService) {}
 
   @Post('/:id/finish')

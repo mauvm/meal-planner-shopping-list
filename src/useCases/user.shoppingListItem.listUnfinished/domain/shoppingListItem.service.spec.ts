@@ -1,18 +1,17 @@
 import { container } from 'tsyringe'
 import { stub, assert } from 'sinon'
 import { expect } from 'chai'
+import { plainToClass } from 'class-transformer'
 import ShoppingListItemService from './shoppingListItem.service'
 import ShoppingListItemRepository from '../infra/shoppingListItem.repository'
 import ShoppingListItemEntity from '../../../shared/domain/shoppingListItem.entity'
-import clearContainerInstances from '../../../shared/infra/clearContainerInstances.util'
-import { plainToClass } from 'class-transformer'
 
 describe('ShoppingListItemService', () => {
   let service: ShoppingListItemService
   let repository: ShoppingListItemRepository
 
   beforeEach(() => {
-    clearContainerInstances(container)
+    container.clearInstances()
 
     service = container.resolve(ShoppingListItemService)
     repository = container.resolve(ShoppingListItemRepository)

@@ -6,7 +6,6 @@ import HttpStatus from 'http-status-codes'
 import { uuid } from 'uuidv4'
 import { createApp, cleanUpApp } from '../../../app'
 import ConfigService from '../../../shared/domain/config.service'
-import clearContainerInstances from '../../../shared/infra/clearContainerInstances.util'
 import ShoppingListItemStore from '../../../shared/infra/shoppingListItem.store'
 import ShoppingListItemCreated from '../../user.shoppingListItem.create/domain/shoppingListItemCreated.event'
 import ShoppingListItemFinished from '../../user.shoppingListItem.finish/domain/shoppingListItemFinished.event'
@@ -19,7 +18,7 @@ describe('ListUnfinishedShoppingListItemV1Controller', () => {
   let eventStore: EventStore
 
   beforeEach(async () => {
-    clearContainerInstances(container)
+    container.clearInstances()
 
     config = container.resolve(ConfigService)
     config.set('logger.level', 'warn')

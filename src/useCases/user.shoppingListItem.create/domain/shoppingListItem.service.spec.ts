@@ -4,7 +4,6 @@ import { expect } from 'chai'
 import { uuid } from 'uuidv4'
 import ShoppingListItemService from './shoppingListItem.service'
 import ShoppingListItemRepository from '../infra/shoppingListItem.repository'
-import clearContainerInstances from '../../../shared/infra/clearContainerInstances.util'
 import { plainToClass } from 'class-transformer'
 import ShoppingListItemEntity from '../../../shared/domain/shoppingListItem.entity'
 
@@ -13,7 +12,7 @@ describe('ShoppingListItemService', () => {
   let repository: ShoppingListItemRepository
 
   beforeEach(() => {
-    clearContainerInstances(container)
+    container.clearInstances()
 
     service = container.resolve(ShoppingListItemService)
     repository = container.resolve(ShoppingListItemRepository)

@@ -4,21 +4,20 @@ import { expect } from 'chai'
 import { uuid } from 'uuidv4'
 import ShoppingListItemService from './shoppingListItem.service'
 import ShoppingListItemRepository from '../infra/shoppingListItem.repository'
-import clearContainerInstances from '../../../shared/infra/clearContainerInstances.util'
 
 describe('ShoppingListItemService', () => {
   let service: ShoppingListItemService
   let repository: ShoppingListItemRepository
 
   beforeEach(() => {
-    clearContainerInstances(container)
+    container.clearInstances()
 
     service = container.resolve(ShoppingListItemService)
     repository = container.resolve(ShoppingListItemRepository)
   })
 
   describe('should have a "finish" method that', () => {
-    it('resolves to an ID for the finished shopping list item', async () => {
+    it('resolves when item is marked as finished', async () => {
       // Data
       const id = uuid()
 

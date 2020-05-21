@@ -5,14 +5,13 @@ import { uuid } from 'uuidv4'
 import ShoppingListItemService from './shoppingListItem.service'
 import ShoppingListItemRepository from '../infra/shoppingListItem.repository'
 import ShoppingListItemEntity from '../../../shared/domain/shoppingListItem.entity'
-import clearContainerInstances from '../../../shared/infra/clearContainerInstances.util'
 
 describe('ShoppingListItemService', () => {
   let service: ShoppingListItemService
   let repository: ShoppingListItemRepository
 
   beforeEach(() => {
-    clearContainerInstances(container)
+    container.clearInstances()
 
     service = container.resolve(ShoppingListItemService)
     repository = container.resolve(ShoppingListItemRepository)
