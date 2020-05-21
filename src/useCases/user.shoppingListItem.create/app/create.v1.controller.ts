@@ -27,7 +27,7 @@ export default class CreateShoppingListItemV1Controller {
   @Post('/')
   @Redirect('/v1/shopping-lists/items/:id')
   @HttpCode(HttpStatus.SEE_OTHER)
-  async fetch(
+  async create(
     @Body() data: CreateRequestParamsDTO,
     @Res() res: Response,
   ): Promise<{ id: string }> {

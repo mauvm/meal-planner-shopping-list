@@ -16,7 +16,7 @@ export default class FinishShoppingListItemV1Controller {
 
   @Post('/:id/finish')
   @OnUndefined(HttpStatus.NO_CONTENT)
-  async fetch(@Params() { id }: FinishRequestParamsDTO): Promise<void> {
+  async finish(@Params() { id }: FinishRequestParamsDTO): Promise<void> {
     await this.service.finish(id)
   }
 }
