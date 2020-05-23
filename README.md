@@ -14,7 +14,8 @@ yarn test:dev
 ## Deploy
 
 ```bash
-yarn version # For current version and version bumping
-docker build -t shopping-list-service:$VERSION .
+minikube docker-env | Invoke-Expression # On Windows
+kubectl port-forward service/event-store-service 1113:1113
+docker build -t shopping-list-service .
 # Deploy via infrastructure/
 ```
