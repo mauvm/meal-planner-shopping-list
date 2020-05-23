@@ -48,12 +48,24 @@ export default class EventStore implements AutoLoadableStore {
     const password = 'changeit'
     const host = process.env.EVENT_STORE_SERVICE_SERVICE_HOST || 'localhost'
     const port = Number(
-      process.env.EVENT_STORE_SERVICE_SERVICE_PORT_CLIENT_API || 1113,
+      process.env.EVENT_STORE_SERVICE_SERVICE_PORT_TCP_CLIENT_API || 1113,
     )
 
     this.client = createConnection(
       {
+        // log: {
+        //   debug: (fmt, ...args) => {
+        //     this.logger.debug(`EventStore: ${fmt}`, args)
+        //   },
+        //   info: (fmt, ...args) => {
+        //     this.logger.info(`EventStore: ${fmt}`, args)
+        //   },
+        //   error: (fmt, ...args) => {
+        //     this.logger.error(`EventStore: ${fmt}`, args)
+        //   },
+        // },
         defaultUserCredentials: new UserCredentials(username, password),
+        maxReconnections: -1, // No limit
       },
       `tcp://${host}:${port}`,
     )
