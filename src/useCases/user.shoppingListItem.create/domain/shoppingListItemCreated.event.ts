@@ -9,11 +9,11 @@ export default class ShoppingListItemCreated extends Event {
   constructor(
     readonly eventId: string | null,
     readonly aggregateId: string,
-    data: { title: string },
+    data: { title: string; createdAt?: string },
   ) {
     super(eventId, aggregateId, data)
 
-    this.data.createdAt = new Date().toISOString()
+    this.data.createdAt = data.createdAt || new Date().toISOString()
   }
 
   applyTo(aggregate: any): void {
