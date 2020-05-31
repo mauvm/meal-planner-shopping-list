@@ -25,6 +25,7 @@
     "cli-highlight": "^2.1.4",
     "glob": "^7.1.6",
     "http-status-codes": "^1.4.0",
+    "kcors": "^2.2.2",
     "koa": "^2.11.0",
     "koa-bodyparser": "^4.3.0",
     "koa-router": "^8.0.0-alpha.1",

@@ -83,6 +83,7 @@ export async function createApp(): Promise<Koa> {
   })
 
   const app = createKoaServer({
+    cors: true,
     controllers: [__dirname + '/useCases/*/app/**/*.controller.{js,ts}'],
     classTransformer: true,
   }) as Koa
