@@ -3,14 +3,14 @@ import { container } from 'tsyringe'
 import { expect } from 'chai'
 import request from 'supertest'
 import HttpStatus from 'http-status-codes'
-import ShoppingListItemLabelsChanged from '../domain/shoppingListItemLabelsChanged.event'
+import ShoppingListItemTitleChanged from '../domain/shoppingListItemTitleChanged.event'
 import { createApp, cleanUpApp } from '../../../app'
 import ConfigService from '../../../shared/domain/config.service'
 import EventStore from '../../../shared/infra/event.store'
 import EventMockStore from '../../../shared/infra/event.store.mock'
 import ShoppingListItemStore from '../../../shared/infra/shoppingListItem.store'
 
-describe('SetShoppingListItemLabelsV1Controller', () => {
+describe('SetShoppingListItemTitleV1Controller', () => {
   let server: Server
   let config: ConfigService
   let eventStore: EventStore
@@ -32,7 +32,7 @@ describe('SetShoppingListItemLabelsV1Controller', () => {
     await cleanUpApp(server)
   })
 
-  describe('should have a POST /v1/shopping-lists/items/:id/set-labels endpoint that', () => {
+  describe('should have a PATCH /v1/shopping-lists/items/:id endpoint that', () => {
     it('returns a 204 No Content on success', async () => {
       // Dependencies
       const shoppingListItemStore = container.resolve(ShoppingListItemStore)
@@ -44,18 +44,17 @@ describe('SetShoppingListItemLabelsV1Controller', () => {
 
       // Execute
       await request(server)
-        .post(`/v1/shopping-lists/items/${id}/set-labels`)
-        .send({ labels: ['Foo', 'Bar'] })
+        .patch(`/v1/shopping-lists/items/${id}`)
+        .send({ title: 'Other title' })
         .expect(HttpStatus.NO_CONTENT)
 
       // Test
       const aggregate = shoppingListItemStore.getAggregateById(id)
       expect(aggregate?.events).to.be.an('array').with.length(2)
       expect(aggregate?.events[1]).to.be.instanceOf(
-        ShoppingListItemLabelsChanged,
+        ShoppingListItemTitleChanged,
       )
-      expect(aggregate?.data?.title).to.equal('Test')
-      expect(aggregate?.data?.labels).to.deep.equal(['Bar', 'Foo'])
+      expect(aggregate?.data?.title).to.equal('Other title')
     })
 
     // @todo Write test for non existant ID

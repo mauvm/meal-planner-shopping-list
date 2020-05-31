@@ -1,36 +1,36 @@
 import { singleton } from 'tsyringe'
 import {
   JsonController,
-  Post,
+  Patch,
   OnUndefined,
   Params,
   Body,
 } from 'routing-controllers'
-import { IsUUID, IsArray } from 'class-validator'
+import { IsUUID, IsString } from 'class-validator'
 import HttpStatus from 'http-status-codes'
 import ShoppingListItemService from '../domain/shoppingListItem.service'
 
-class SetItemLabelsRequestParamsDTO {
+class SetItemTitleRequestParamsDTO {
   @IsUUID()
   id: string
 }
 
-class SetItemLabelsRequestBodyDTO {
-  @IsArray()
-  labels: string[] = []
+class SetItemTitleRequestBodyDTO {
+  @IsString()
+  title: string
 }
 
 @singleton()
 @JsonController('/v1/shopping-lists/items')
-export default class SetShoppingListItemLabelsV1Controller {
+export default class SetShoppingListItemTitleV1Controller {
   constructor(private service: ShoppingListItemService) {}
 
-  @Post('/:id/set-labels')
+  @Patch('/:id')
   @OnUndefined(HttpStatus.NO_CONTENT)
-  async fetch(
-    @Params() { id }: SetItemLabelsRequestParamsDTO,
-    @Body() { labels }: SetItemLabelsRequestBodyDTO,
+  async update(
+    @Params() { id }: SetItemTitleRequestParamsDTO,
+    @Body() { title }: SetItemTitleRequestBodyDTO,
   ): Promise<void> {
-    await this.service.setLabels(id, labels)
+    await this.service.setTitle(id, title)
   }
 }
