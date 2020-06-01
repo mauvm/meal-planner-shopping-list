@@ -5,10 +5,13 @@ import {
   OnUndefined,
   Params,
   Body,
+  BadRequestError,
 } from 'routing-controllers'
-import { IsUUID, IsArray } from 'class-validator'
+import { IsUUID, IsArray, IsString, IsNotEmpty } from 'class-validator'
 import HttpStatus from 'http-status-codes'
+import { AssertionError } from 'assert'
 import ShoppingListItemService from '../domain/shoppingListItem.service'
+import ShoppingListItemCreated from '../../user.shoppingListItem.create/domain/shoppingListItemCreated.event'
 
 class SetItemLabelsRequestParamsDTO {
   @IsUUID()
@@ -17,6 +20,8 @@ class SetItemLabelsRequestParamsDTO {
 
 class SetItemLabelsRequestBodyDTO {
   @IsArray()
+  @IsString({ each: true })
+  @IsNotEmpty({ each: true })
   labels: string[] = []
 }
 
@@ -31,6 +36,17 @@ export default class SetShoppingListItemLabelsV1Controller {
     @Params() { id }: SetItemLabelsRequestParamsDTO,
     @Body() { labels }: SetItemLabelsRequestBodyDTO,
   ): Promise<void> {
-    await this.service.setLabels(id, labels)
+    try {
+      await this.service.setLabels(id, labels)
+    } catch (err) {
+      if (
+        err instanceof AssertionError &&
+        err.expected === ShoppingListItemCreated.name
+      ) {
+        throw new BadRequestError(`No shopping list item found for ID "${id}"`)
+      }
+
+      throw err
+    }
   }
 }

@@ -28,7 +28,7 @@ describe('ShoppingListItemService', () => {
       const promise = service.finish(id)
 
       // Test
-      await expect(promise).to.eventually.be.fulfilled
+      await expect(promise).to.be.fulfilled
       assert.calledOnceWithExactly(finish, id)
     })
   })

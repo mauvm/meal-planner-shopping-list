@@ -43,7 +43,7 @@ describe('ShoppingListItemService', () => {
       const promise = service.findOneByIdOrFail(id)
 
       // Test
-      await expect(promise).to.eventually.be.rejectedWith(
+      await expect(promise).to.be.rejectedWith(
         `Shopping list item "${id}" not found!`,
       )
       assert.calledOnceWithExactly(findOne, id)

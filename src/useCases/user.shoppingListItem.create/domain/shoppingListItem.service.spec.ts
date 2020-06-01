@@ -36,5 +36,21 @@ describe('ShoppingListItemService', () => {
       assert.calledOnceWithExactly(create, { title })
       expect(item.id).to.equal(id)
     })
+
+    it('trims the title', async () => {
+      // Data
+      const id = uuid()
+      const title = ' Test '
+
+      // Dependencies
+      const create = stub(repository, 'create').resolves(id)
+
+      // Execute
+      const promise = service.create({ title })
+
+      // Test
+      await expect(promise).to.be.fulfilled
+      assert.calledOnceWithExactly(create, { title: 'Test' })
+    })
   })
 })

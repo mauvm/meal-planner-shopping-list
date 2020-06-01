@@ -29,8 +29,40 @@ describe('ShoppingListItemService', () => {
       const promise = service.setLabels(id, labels)
 
       // Test
-      await expect(promise).to.eventually.be.fulfilled
+      await expect(promise).to.be.fulfilled
       assert.calledOnceWithExactly(setLabels, id, labels)
+    })
+
+    it('trims the labels', async () => {
+      // Data
+      const id = uuid()
+      const labels = [' Foo ', 'Bar\t  ']
+
+      // Dependencies
+      const setLabels = stub(repository, 'setLabels').resolves()
+
+      // Execute
+      const promise = service.setLabels(id, labels)
+
+      // Test
+      await expect(promise).to.be.fulfilled
+      assert.calledOnceWithExactly(setLabels, id, ['Foo', 'Bar'])
+    })
+
+    it('ignores empty labels', async () => {
+      // Data
+      const id = uuid()
+      const labels = ['Foo', '', 'Bar\t  ', '   ']
+
+      // Dependencies
+      const setLabels = stub(repository, 'setLabels').resolves()
+
+      // Execute
+      const promise = service.setLabels(id, labels)
+
+      // Test
+      await expect(promise).to.be.fulfilled
+      assert.calledOnceWithExactly(setLabels, id, ['Foo', 'Bar'])
     })
   })
 })
