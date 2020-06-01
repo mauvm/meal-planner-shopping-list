@@ -1,4 +1,4 @@
-import { Event } from '../../../shared/infra/event.store'
+import { Event } from '../infra/event.store'
 
 export default class ShoppingListItemCreated extends Event {
   static readonly type = 'shopping-list-item-created'

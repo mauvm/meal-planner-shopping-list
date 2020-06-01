@@ -1,8 +1,8 @@
 import { singleton } from 'tsyringe'
-import ShoppingListItemCreated from '../../user.shoppingListItem.create/domain/shoppingListItemCreated.event'
+import { plainToClass } from 'class-transformer'
+import ShoppingListItemCreated from '../../../shared/domain/shoppingListItemCreated.event'
 import ShoppingListItemEntity from '../../../shared/domain/shoppingListItem.entity'
 import ShoppingListItemStore from '../../../shared/infra/shoppingListItem.store'
-import { plainToClass } from 'class-transformer'
 
 @singleton()
 export default class ShoppingListItemRepository {

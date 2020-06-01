@@ -1,6 +1,6 @@
 import { singleton } from 'tsyringe'
-import ShoppingListItemEntity from '../../../shared/domain/shoppingListItem.entity'
 import ShoppingListItemRepository from '../infra/shoppingListItem.repository'
+import ShoppingListItemEntity from '../../../shared/domain/shoppingListItem.entity'
 
 @singleton()
 export default class ShoppingListItemService {

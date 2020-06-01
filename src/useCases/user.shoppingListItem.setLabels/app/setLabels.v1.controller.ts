@@ -11,7 +11,7 @@ import { IsUUID, IsArray, IsString, IsNotEmpty } from 'class-validator'
 import HttpStatus from 'http-status-codes'
 import { AssertionError } from 'assert'
 import ShoppingListItemService from '../domain/shoppingListItem.service'
-import ShoppingListItemCreated from '../../user.shoppingListItem.create/domain/shoppingListItemCreated.event'
+import ShoppingListItemCreated from '../../../shared/domain/shoppingListItemCreated.event'
 
 class SetItemLabelsRequestParamsDTO {
   @IsUUID()

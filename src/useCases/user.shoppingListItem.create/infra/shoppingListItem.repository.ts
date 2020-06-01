@@ -1,6 +1,6 @@
 import { singleton } from 'tsyringe'
 import { uuid } from 'uuidv4'
-import ShoppingListItemCreated from '../domain/shoppingListItemCreated.event'
+import ShoppingListItemCreated from '../../../shared/domain/shoppingListItemCreated.event'
 import EventStore from '../../../shared/infra/event.store'
 
 @singleton()

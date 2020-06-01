@@ -7,7 +7,7 @@ import { uuid } from 'uuidv4'
 import { createApp, cleanUpApp } from '../../../app'
 import ConfigService from '../../../shared/domain/config.service'
 import ShoppingListItemStore from '../../../shared/infra/shoppingListItem.store'
-import ShoppingListItemCreated from '../../user.shoppingListItem.create/domain/shoppingListItemCreated.event'
+import ShoppingListItemCreated from '../../../shared/domain/shoppingListItemCreated.event'
 import EventMockStore from '../../../shared/infra/event.store.mock'
 import EventStore from '../../../shared/infra/event.store'
 

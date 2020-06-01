@@ -9,7 +9,7 @@ import { IsUUID } from 'class-validator'
 import { plainToClass } from 'class-transformer'
 import { AssertionError } from 'assert'
 import ShoppingListItemService from '../domain/shoppingListItem.service'
-import ShoppingListItemCreated from '../../user.shoppingListItem.create/domain/shoppingListItemCreated.event'
+import ShoppingListItemCreated from '../../../shared/domain/shoppingListItemCreated.event'
 import ShoppingListItemEntity from '../../../shared/domain/shoppingListItem.entity'
 
 class FetchRequestParamsDTO {

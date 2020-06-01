@@ -2,7 +2,7 @@ import { singleton } from 'tsyringe'
 import ShoppingListItemFinished from '../domain/shoppingListItemFinished.event'
 import EventStore from '../../../shared/infra/event.store'
 import ShoppingListItemStore from '../../../shared/infra/shoppingListItem.store'
-import ShoppingListItemCreated from '../../user.shoppingListItem.create/domain/shoppingListItemCreated.event'
+import ShoppingListItemCreated from '../../../shared/domain/shoppingListItemCreated.event'
 
 @singleton()
 export default class ShoppingListItemRepository {
