@@ -1,7 +1,7 @@
 {
   "name": "meal-planner.shopping-list-service",
   "description": "API for shopping lists",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "private": true,
   "author": "Maurits van Mastrigt <maurits@nerdieworks.nl>",
   "license": "MIT",
