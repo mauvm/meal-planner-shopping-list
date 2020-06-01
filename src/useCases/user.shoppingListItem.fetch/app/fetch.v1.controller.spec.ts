@@ -34,11 +34,26 @@ describe('FetchShoppingListItemV1Controller', () => {
   })
 
   describe('should have a GET /v1/shopping-lists/items/:id endpoint that', () => {
+    it('returns a 400 Bad Request on non-existant item', async () => {
+      // Data
+      const id = uuid()
+
+      // Execute
+      const response = await request(server)
+        .get(`/v1/shopping-lists/items/${id}`)
+        .expect(HttpStatus.BAD_REQUEST)
+
+      // Test
+      expect(response.body.message).to.equal(
+        `No shopping list item found for ID "${id}"`,
+      )
+    })
+
     it('returns a 200 OK with shopping list item', async () => {
       // Data
-      const aggregateId = uuid()
+      const id = uuid()
       const data = { title: 'Test' }
-      const createdEvent = new ShoppingListItemCreated(null, aggregateId, data)
+      const createdEvent = new ShoppingListItemCreated(null, id, data)
 
       // Dependencies
       const shoppingListItemStore = container.resolve(ShoppingListItemStore)
@@ -46,13 +61,13 @@ describe('FetchShoppingListItemV1Controller', () => {
 
       // Execute
       const response = await request(server)
-        .get(`/v1/shopping-lists/items/${aggregateId}`)
+        .get(`/v1/shopping-lists/items/${id}`)
         .expect(HttpStatus.OK)
         .expect('Content-Type', /json/)
 
       // Test
       const item = response.body?.data
-      expect(item?.id).to.equal(aggregateId)
+      expect(item?.id).to.equal(id)
       expect(item?.title).to.equal(data.title)
     })
   })

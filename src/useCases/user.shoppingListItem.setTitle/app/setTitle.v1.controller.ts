@@ -5,10 +5,13 @@ import {
   OnUndefined,
   Params,
   Body,
+  BadRequestError,
 } from 'routing-controllers'
 import { IsUUID, IsString } from 'class-validator'
 import HttpStatus from 'http-status-codes'
+import { AssertionError } from 'assert'
 import ShoppingListItemService from '../domain/shoppingListItem.service'
+import ShoppingListItemCreated from '../../user.shoppingListItem.create/domain/shoppingListItemCreated.event'
 
 class SetItemTitleRequestParamsDTO {
   @IsUUID()
@@ -31,6 +34,17 @@ export default class SetShoppingListItemTitleV1Controller {
     @Params() { id }: SetItemTitleRequestParamsDTO,
     @Body() { title }: SetItemTitleRequestBodyDTO,
   ): Promise<void> {
-    await this.service.setTitle(id, title)
+    try {
+      await this.service.setTitle(id, title)
+    } catch (err) {
+      if (
+        err instanceof AssertionError &&
+        err.expected === ShoppingListItemCreated.name
+      ) {
+        throw new BadRequestError(`No shopping list item found for ID "${id}"`)
+      }
+
+      throw err
+    }
   }
 }

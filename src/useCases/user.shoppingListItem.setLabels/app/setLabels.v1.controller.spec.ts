@@ -3,6 +3,7 @@ import { container } from 'tsyringe'
 import { expect } from 'chai'
 import request from 'supertest'
 import HttpStatus from 'http-status-codes'
+import { uuid } from 'uuidv4'
 import ShoppingListItemLabelsChanged from '../domain/shoppingListItemLabelsChanged.event'
 import { createApp, cleanUpApp } from '../../../app'
 import ConfigService from '../../../shared/domain/config.service'
@@ -33,6 +34,22 @@ describe('SetShoppingListItemLabelsV1Controller', () => {
   })
 
   describe('should have a POST /v1/shopping-lists/items/:id/set-labels endpoint that', () => {
+    it('returns a 400 Bad Request on non-existant item', async () => {
+      // Data
+      const id = uuid()
+
+      // Execute
+      const response = await request(server)
+        .post(`/v1/shopping-lists/items/${id}/set-labels`)
+        .send({ labels: ['Foo', 'Bar'] })
+        .expect(HttpStatus.BAD_REQUEST)
+
+      // Test
+      expect(response.body.message).to.equal(
+        `No shopping list item found for ID "${id}"`,
+      )
+    })
+
     it('returns a 204 No Content on success', async () => {
       // Dependencies
       const shoppingListItemStore = container.resolve(ShoppingListItemStore)
@@ -57,7 +74,5 @@ describe('SetShoppingListItemLabelsV1Controller', () => {
       expect(aggregate?.data?.title).to.equal('Test')
       expect(aggregate?.data?.labels).to.deep.equal(['Bar', 'Foo'])
     })
-
-    // @todo Write test for non existant ID
   })
 })

@@ -7,12 +7,7 @@ export default class ShoppingListItemService {
   constructor(private repository: ShoppingListItemRepository) {}
 
   async findOneByIdOrFail(id: string): Promise<ShoppingListItemEntity> {
-    const item = await this.repository.findOne(id)
-
-    if (!item) {
-      throw new Error(`Shopping list item "${id}" not found!`)
-    }
-
+    const item = await this.repository.findOneOrFail(id)
     return item
   }
 }

@@ -3,6 +3,7 @@ import { container } from 'tsyringe'
 import { expect } from 'chai'
 import request from 'supertest'
 import HttpStatus from 'http-status-codes'
+import { uuid } from 'uuidv4'
 import ShoppingListItemTitleChanged from '../domain/shoppingListItemTitleChanged.event'
 import { createApp, cleanUpApp } from '../../../app'
 import ConfigService from '../../../shared/domain/config.service'
@@ -33,6 +34,22 @@ describe('SetShoppingListItemTitleV1Controller', () => {
   })
 
   describe('should have a PATCH /v1/shopping-lists/items/:id endpoint that', () => {
+    it('returns a 400 Bad Request on non-existant item', async () => {
+      // Data
+      const id = uuid()
+
+      // Execute
+      const response = await request(server)
+        .patch(`/v1/shopping-lists/items/${id}`)
+        .send({ title: 'Other title' })
+        .expect(HttpStatus.BAD_REQUEST)
+
+      // Test
+      expect(response.body.message).to.equal(
+        `No shopping list item found for ID "${id}"`,
+      )
+    })
+
     it('returns a 204 No Content on success', async () => {
       // Dependencies
       const shoppingListItemStore = container.resolve(ShoppingListItemStore)

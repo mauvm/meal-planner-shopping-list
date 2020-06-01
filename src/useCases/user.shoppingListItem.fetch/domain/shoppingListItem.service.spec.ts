@@ -25,28 +25,14 @@ describe('ShoppingListItemService', () => {
       const item = container.resolve(ShoppingListItemEntity)
 
       // Dependencies
-      const findOne = stub(repository, 'findOne').resolves(item)
+      const findOneOrFail = stub(repository, 'findOneOrFail').resolves(item)
 
       // Execute
       const promise = service.findOneByIdOrFail(id)
 
       // Test
       await expect(promise).to.eventually.equal(item)
-      assert.calledOnceWithExactly(findOne, id)
-    })
-
-    it('rejects with an error when no ShoppingListItemEntity is found for given ID', async () => {
-      // Dependencies
-      const findOne = stub(repository, 'findOne').resolves(undefined)
-
-      // Execute
-      const promise = service.findOneByIdOrFail(id)
-
-      // Test
-      await expect(promise).to.be.rejectedWith(
-        `Shopping list item "${id}" not found!`,
-      )
-      assert.calledOnceWithExactly(findOne, id)
+      assert.calledOnceWithExactly(findOneOrFail, id)
     })
   })
 })
