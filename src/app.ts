@@ -58,7 +58,7 @@ async function autoCleanUpStores() {
 async function autoRegisterEvents() {
   const logger = container.resolve(LoggerService)
   const files = glob.sync(
-    path.resolve(__dirname, 'useCases/*/domain/*.event.{js,ts}'),
+    path.resolve(__dirname, '{shared,useCases/*}/domain/*.event.{js,ts}'),
   )
 
   if (files.length === 0) {
