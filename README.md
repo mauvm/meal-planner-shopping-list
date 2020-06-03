@@ -29,3 +29,12 @@ docker build -t shopping-list-service .
 
 # Deploy via infrastructure repository
 ```
+
+### Github Actions
+
+For Docker image builds with Github Actions you must configure the following secrets:
+
+- `DOCKER_HOST`: domain name for custom registry, leave blank to use Docker Hub
+- `DOCKER_USERNAME`: username for registry authentication
+- `DOCKER_PASSWORD`: password for registry authentication
+- `DOCKER_REPOSITORY`: the repository/user and image name, for example: `meal-planner/shopping-list-service`
