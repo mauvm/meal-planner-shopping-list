@@ -40,16 +40,16 @@ describe('ListUnfinishedShoppingListItemV1Controller', () => {
       const aggregateId1 = uuid()
       const aggregateId2 = uuid()
       const aggregateId3 = uuid()
-      const createEvent1 = new ShoppingListItemCreated(null, aggregateId1, {
+      const createEvent1 = new ShoppingListItemCreated('1', aggregateId1, {
         title: 'Item 1',
       })
-      const createEvent2 = new ShoppingListItemCreated(null, aggregateId2, {
+      const createEvent2 = new ShoppingListItemCreated('2', aggregateId2, {
         title: 'Item 2',
       })
-      const finishEvent = new ShoppingListItemFinished(null, aggregateId2)
+      const finishEvent = new ShoppingListItemFinished('3', aggregateId2)
 
       await new Promise((resolve) => setTimeout(resolve, 10)) // event2 must be after event1
-      const createEvent3 = new ShoppingListItemCreated(null, aggregateId3, {
+      const createEvent3 = new ShoppingListItemCreated('4', aggregateId3, {
         title: 'Item 3',
       })
 

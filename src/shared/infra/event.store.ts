@@ -90,7 +90,7 @@ export default class EventStore implements AutoLoadableStore {
     this.client.close()
   }
 
-  async persistEvent(streamName: string, event: Event): Promise<void> {
+  async persistEvent(streamName: string, event: Event): Promise<string> {
     const eventToStore = createJsonEventData(
       uuid(),
       event.data,
@@ -122,6 +122,8 @@ export default class EventStore implements AutoLoadableStore {
       storedEventId: eventToStore.eventId,
       writeResult,
     })
+
+    return eventToStore.eventId
   }
 
   catchUpStream(streamName: string, callback: EventCallback): void {

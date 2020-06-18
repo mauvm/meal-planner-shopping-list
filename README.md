@@ -12,7 +12,7 @@ This service requires an [EventStore](https://eventstore.com/) instance for pers
 yarn install
 
 # See https://github.com/mauvm/meal-planner-infrastructure
-kubectl port-forward service/event-store-service 1113:1113
+kubectl port-forward -n meal-planner service/event-store-service 1113:1113
 
 yarn dev
 yarn test:dev

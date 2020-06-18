@@ -1,5 +1,6 @@
-import EventStore, { Event, EventCallback } from './event.store'
 import { singleton } from 'tsyringe'
+import { uuid } from 'uuidv4'
+import EventStore, { Event, EventCallback } from './event.store'
 
 @singleton()
 export default class EventMockStore extends EventStore {
@@ -16,15 +17,20 @@ export default class EventMockStore extends EventStore {
    * to the listeners that are registered via `catchUpStream()`.
    */
   async persistEvent(streamName: string, event: Event) {
-    const listeners = this.streamListeners.get(streamName)
+    // Recreate event to add eventId
+    const eventToStore = new (event.constructor as typeof Event)(
+      uuid(),
+      event.aggregateId,
+      event.data,
+    )
 
-    if (!listeners) {
-      return
-    }
+    const listeners = this.streamListeners.get(streamName) || []
 
     for (const listener of listeners) {
-      listener(event)
+      setImmediate(() => listener(eventToStore))
     }
+
+    return eventToStore.eventId as string
   }
 
   catchUpStream(streamName: string, callback: EventCallback) {

@@ -53,7 +53,7 @@ describe('FetchShoppingListItemV1Controller', () => {
       // Data
       const id = uuid()
       const data = { title: 'Test' }
-      const createdEvent = new ShoppingListItemCreated(null, id, data)
+      const createdEvent = new ShoppingListItemCreated('1', id, data)
 
       // Dependencies
       const shoppingListItemStore = container.resolve(ShoppingListItemStore)

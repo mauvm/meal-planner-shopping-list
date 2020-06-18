@@ -3119,6 +3119,11 @@ type-is@^1.6.16:
     media-typer "0.3.0"
     mime-types "~2.1.24"
 
+typed-ts-events@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/typed-ts-events/-/typed-ts-events-1.1.1.tgz#77785348998f55c66ec4c1d40667786eb756a889"
+  integrity sha512-sYjxQrhBTg3HGzNBOXSURlIfmUGXS//dVGY08ofz9dbusX/IdcN8LD9SsFNbk4UgHy8reQPgSZw+ADpkLcPtDA==
+
 typedarray-to-buffer@^3.1.5:
   version "3.1.5"
   resolved "https://registry.yarnpkg.com/typedarray-to-buffer/-/typedarray-to-buffer-3.1.5.tgz#a97ee7a9ff42691b9f783ff1bc5112fe3fca9080"
