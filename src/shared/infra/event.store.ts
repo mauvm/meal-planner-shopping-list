@@ -136,8 +136,11 @@ export default class EventStore implements AutoLoadableStore {
       const type = String(event!.event!.eventType)
       const data = JSON.parse(event!.event!.data!.toString('utf8'))
 
-      const eventClass = eventClasses.find(
-        (eventClass) => eventClass.type === type,
+      let eventClass = eventClasses.find(
+        (eventClass) =>
+          eventClass.type === type ||
+          // @todo Remove this dirty fix for shopping-list to list service rename
+          `shopping-${eventClass.type}` === type,
       )
 
       if (!eventClass) {
