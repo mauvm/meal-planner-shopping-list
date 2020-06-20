@@ -8,9 +8,9 @@ import {
   getMetadataArgsStorage,
 } from 'routing-controllers'
 import glob from 'glob'
-import LoggerService from './shared/domain/logger.service'
-import AutoLoadableStore from './shared/infra/autoLoadableStore.interface'
-import { Event, registerEventClass } from './shared/infra/event.store'
+import LoggerService from './domain/logger.service'
+import AutoLoadableStore from './infra/autoLoadableStore.interface'
+import { Event, registerEventClass } from './infra/event.store'
 
 function debugRegisteredControllers() {
   const logger = container.resolve(LoggerService)
@@ -27,9 +27,7 @@ const loadedStores: AutoLoadableStore[] = []
 
 async function autoLoadStores() {
   const logger = container.resolve(LoggerService)
-  const files = glob.sync(
-    path.resolve(__dirname, 'shared/infra/*.store.{js,ts}'),
-  )
+  const files = glob.sync(path.resolve(__dirname, 'infra/**/*.store.{js,ts}'))
 
   if (files.length === 0) {
     logger.debug('No stores to initialize')
@@ -57,9 +55,7 @@ async function autoCleanUpStores() {
 
 async function autoRegisterEvents() {
   const logger = container.resolve(LoggerService)
-  const files = glob.sync(
-    path.resolve(__dirname, '{shared,useCases/*}/domain/*.event.{js,ts}'),
-  )
+  const files = glob.sync(path.resolve(__dirname, 'domain/**/*.event.{js,ts}'))
 
   if (files.length === 0) {
     logger.debug('No events to initialize')
@@ -84,7 +80,7 @@ export async function createApp(): Promise<Koa> {
 
   const app = createKoaServer({
     cors: true,
-    controllers: [__dirname + '/useCases/*/app/**/*.controller.{js,ts}'],
+    controllers: [path.resolve(__dirname, 'app/**/*.controller.{js,ts}')],
     classTransformer: true,
   }) as Koa
 

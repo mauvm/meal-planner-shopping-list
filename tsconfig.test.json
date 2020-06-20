@@ -16,5 +16,5 @@
     "types": ["mocha"]
   },
   "exclude": ["node_modules/", "src/server.ts"],
-  "include": ["src/**/*.ts"]
+  "include": ["src/test.ts", "src/**/*.ts"]
 }
