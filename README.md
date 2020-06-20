@@ -1,6 +1,6 @@
-# Meal Planner: Shopping List Service
+# Meal Planner: List Service
 
-> API for managing shopping list items
+> API for managing list items
 
 This TypeScript service is part of the [Meal Planner project](https://github.com/users/mauvm/projects/1).
 
@@ -25,7 +25,7 @@ yarn test:dev
 eval $(minikube docker-env) # Or "minikube docker-env | Invoke-Expression" on Windows
 
 # Build Docker image
-docker build -t shopping-list-service .
+docker build -t list-service .
 
 # Deploy via infrastructure repository
 ```
@@ -37,4 +37,4 @@ For Docker image builds with Github Actions you must configure the following sec
 - `DOCKER_HOST`: domain name for custom registry, leave blank to use Docker Hub
 - `DOCKER_USERNAME`: username for registry authentication
 - `DOCKER_PASSWORD`: password for registry authentication
-- `DOCKER_REPOSITORY`: the repository/user and image name, for example: `meal-planner/shopping-list-service`
+- `DOCKER_REPOSITORY`: the repository/user and image name, for example: `meal-planner/list-service`
