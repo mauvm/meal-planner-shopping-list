@@ -27,7 +27,7 @@ export default class EventMockStore extends EventStore {
     const listeners = this.streamListeners.get(streamName) || []
 
     for (const listener of listeners) {
-      setImmediate(() => listener(eventToStore))
+      listener(eventToStore)
     }
 
     return eventToStore.eventId as string

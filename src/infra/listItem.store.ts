@@ -75,7 +75,18 @@ export default class ListItemStore implements AutoLoadableStore {
     eventId: string,
     timeoutMs = 3 * 1000,
   ): Promise<Event> {
-    assert.ok(eventId, 'Event has no eventId')
+    assert.ok(eventId, 'Empty eventId')
+
+    // Check if event already has been handled
+    for (const aggregate of this.aggregates.values()) {
+      const handledEvent = aggregate.events.find(
+        (event) => event.eventId === eventId,
+      )
+
+      if (handledEvent) {
+        return handledEvent
+      }
+    }
 
     return new Promise((resolve, reject) => {
       let timer: NodeJS.Timeout
