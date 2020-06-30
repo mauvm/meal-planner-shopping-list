@@ -2,7 +2,7 @@ import { container } from 'tsyringe'
 import { stub, assert, SinonStub } from 'sinon'
 import { expect } from 'chai'
 import { uuid } from 'uuidv4'
-import { plainToClass } from 'class-transformer'
+import { plainToClass, classToClass } from 'class-transformer'
 import ListItemService from './listItem.service'
 import ListItemRepository from '../infra/listItem.repository'
 import ListItemEntity from '../domain/listItem.entity'
@@ -157,6 +157,25 @@ describe('ListItemService', () => {
       assert.calledOnceWithExactly(searchItems, query)
     })
 
+    it('returns list of found items without duplicates', async () => {
+      // Data
+      item1.labels = ['Bar']
+      item2.labels = ['Rab']
+      const item3 = classToClass(item1)
+      const item4 = classToClass(item2)
+      item4.labels = ['Other']
+
+      // Dependencies
+      searchItems.returns([item1, item2, item3, item4])
+
+      // Execute
+      const result = service.searchItems(query)
+
+      // Test
+      expect(result).to.deep.equal([item1, item2, item4])
+      assert.calledOnceWithExactly(searchItems, query)
+    })
+
     it('returns list of maximum of 20 items', async () => {
       // Data
       const items = Array(21)
@@ -164,7 +183,7 @@ describe('ListItemService', () => {
         .map((_, index) =>
           plainToClass(ListItemEntity, {
             id: uuid(),
-            title: `Item ${index}`,
+            title: `Item ${index + 1}`,
             labels: [],
             createdAt: new Date(Date.now() + index * 1000),
           }),
