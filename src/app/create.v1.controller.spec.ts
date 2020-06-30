@@ -67,5 +67,24 @@ describe('CreateListItemV1Controller', () => {
       expect(response.body).to.deep.equal({ id })
       expect(listItemStore.getAggregateById(id)?.data?.title).to.equal('Test')
     })
+
+    it('returns a 201 Created with new item that has given labels', async () => {
+      // Dependencies
+      const listItemStore = container.resolve(ListItemStore)
+
+      // Execute
+      const response = await request(server)
+        .post('/v1/lists/items')
+        .send({ title: 'Test', labels: ['Foo ', '\tBar'] })
+        .expect(HttpStatus.CREATED)
+
+      // Test
+      const id = response.body.id
+      expect(id).to.be.a('string').that.is.not.empty
+      expect(listItemStore.getAggregateById(id)?.data?.labels).to.deep.equal([
+        'Bar',
+        'Foo',
+      ])
+    })
   })
 })
