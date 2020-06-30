@@ -75,15 +75,8 @@ export default class ListItemRepository {
       item.data.title?.toLowerCase().includes(query.toLowerCase()),
     )
 
-    return (
-      aggregates
-        .map((aggregate) => plainToClass(ListItemEntity, aggregate.data))
-        // Sort by created at (descending)
-        .sort(
-          (item1, item2) =>
-            Number(new Date(item2.createdAt)) -
-            Number(new Date(item1.createdAt)),
-        )
+    return aggregates.map((aggregate) =>
+      plainToClass(ListItemEntity, aggregate.data),
     )
   }
 

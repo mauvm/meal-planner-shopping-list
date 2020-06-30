@@ -2,9 +2,10 @@ import { injectable } from 'tsyringe'
 import {
   IsUUID,
   IsString,
+  IsArray,
+  IsDate,
   IsNotEmpty,
   IsOptional,
-  IsDate,
 } from 'class-validator'
 
 @injectable()
@@ -15,6 +16,11 @@ export default class ListItemEntity {
   @IsNotEmpty()
   @IsString()
   title: string
+
+  @IsArray()
+  @IsString({ each: true })
+  @IsNotEmpty({ each: true })
+  labels: string[] = []
 
   @IsNotEmpty()
   @IsDate()

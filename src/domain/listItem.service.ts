@@ -29,7 +29,28 @@ export default class ListItemService {
   }
 
   searchItems(query: string): ListItemEntity[] {
-    return this.repository.searchItems(query)
+    let items = this.repository.searchItems(query)
+
+    // Remove items with no labels when there are
+    // other items with the same title that do have labels
+    items = items.filter(
+      (item) =>
+        item.labels.length > 0 ||
+        !items.some(
+          (other) =>
+            other.id !== item.id &&
+            other.labels.length > 0 &&
+            other.title.toLowerCase() === item.title.toLowerCase(),
+        ),
+    )
+
+    // Newest items first
+    items.sort(
+      (item1, item2) =>
+        Number(new Date(item2.createdAt)) - Number(new Date(item1.createdAt)),
+    )
+
+    return items
   }
 
   async setTitle(id: string, title: string): Promise<void> {

@@ -1,5 +1,5 @@
 import { container } from 'tsyringe'
-import { stub, assert } from 'sinon'
+import { stub, assert, SinonStub } from 'sinon'
 import { expect } from 'chai'
 import { uuid } from 'uuidv4'
 import { plainToClass } from 'class-transformer'
@@ -99,29 +99,61 @@ describe('ListItemService', () => {
   })
 
   describe('should have a "searchItems" method that', () => {
-    it('returns list of items that match query', async () => {
+    let searchItems: SinonStub
+
+    const query = 'Foo'
+    let item1: ListItemEntity
+    let item2: ListItemEntity
+
+    beforeEach(() => {
       // Data
-      const query = 'Foo'
-      const item1 = plainToClass(ListItemEntity, {
+      item1 = plainToClass(ListItemEntity, {
+        id: uuid(),
         title: 'Foo',
-        createdAt: new Date(Date.now() - 2000),
-      })
-      const item2 = plainToClass(ListItemEntity, {
-        title: 'foo foo',
         createdAt: new Date(Date.now() - 1000),
+      })
+      item2 = plainToClass(ListItemEntity, {
+        id: uuid(),
+        title: 'foo foo',
+        createdAt: new Date(Date.now() - 2000),
       })
 
       // Dependencies
-      const searchItems = stub(repository, 'searchItems').returns([
-        item1,
-        item2,
-      ])
+      searchItems = stub(repository, 'searchItems').returns([item1, item2])
+    })
 
+    it('returns list of items that match query', async () => {
       // Execute
       const result = service.searchItems(query)
 
       // Test
       expect(result).to.deep.equal([item1, item2])
+      assert.calledOnceWithExactly(searchItems, query)
+    })
+
+    it('returns list of found items without same titled items that have no labels', async () => {
+      // Data
+      item2.title = item1.title.toLowerCase()
+      item2.labels = ['bar']
+
+      // Execute
+      const result = service.searchItems(query)
+
+      // Test
+      expect(result).to.deep.equal([item2])
+      assert.calledOnceWithExactly(searchItems, query)
+    })
+
+    it('returns list of found items that have newest items first', async () => {
+      // Data
+      item1.createdAt = new Date(Date.now() - 2000)
+      item2.createdAt = new Date(Date.now() - 1000)
+
+      // Execute
+      const result = service.searchItems(query)
+
+      // Test
+      expect(result).to.deep.equal([item2, item1])
       assert.calledOnceWithExactly(searchItems, query)
     })
   })
