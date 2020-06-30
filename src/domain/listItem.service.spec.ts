@@ -156,6 +156,32 @@ describe('ListItemService', () => {
       expect(result).to.deep.equal([item2, item1])
       assert.calledOnceWithExactly(searchItems, query)
     })
+
+    it('returns list of maximum of 20 items', async () => {
+      // Data
+      const items = Array(21)
+        .fill(null)
+        .map((_, index) =>
+          plainToClass(ListItemEntity, {
+            id: uuid(),
+            title: `Item ${index}`,
+            labels: [],
+            createdAt: new Date(Date.now() + index * 1000),
+          }),
+        )
+
+      // Dependencies
+      searchItems.returns(items)
+
+      // Execute
+      const result = service.searchItems(query)
+
+      // Test
+      expect(result).to.be.an('array').with.lengthOf(20)
+      expect(result[0]).to.deep.equal(items[20])
+      expect(result[19]).to.deep.equal(items[1])
+      assert.calledOnceWithExactly(searchItems, query)
+    })
   })
 
   describe('should have a "setTitle" method that', () => {

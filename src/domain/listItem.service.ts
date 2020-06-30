@@ -50,6 +50,9 @@ export default class ListItemService {
         Number(new Date(item2.createdAt)) - Number(new Date(item1.createdAt)),
     )
 
+    // Limit to 20 results
+    items = items.slice(0, 20)
+
     return items
   }
 
