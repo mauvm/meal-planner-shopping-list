@@ -44,7 +44,7 @@ describe('SearchListItemV1Controller', () => {
           .send({
             title,
           })
-          .expect(HttpStatus.SEE_OTHER)
+          .expect(HttpStatus.CREATED)
       }
 
       // Execute

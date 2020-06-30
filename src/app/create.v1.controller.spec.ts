@@ -51,7 +51,7 @@ describe('CreateListItemV1Controller', () => {
       })
     })
 
-    it('returns a 303 See Other with location header containing the ID', async () => {
+    it('returns a 201 Created with new item ID', async () => {
       // Dependencies
       const listItemStore = container.resolve(ListItemStore)
 
@@ -59,11 +59,12 @@ describe('CreateListItemV1Controller', () => {
       const response = await request(server)
         .post('/v1/lists/items')
         .send({ title: 'Test' })
-        .expect(HttpStatus.SEE_OTHER)
+        .expect(HttpStatus.CREATED)
 
       // Test
-      expect(response.header.location).to.include('/v1/lists/items/')
       const id = response.header['x-resource-id']
+      expect(id).to.be.a('string').that.is.not.empty
+      expect(response.body).to.deep.equal({ id })
       expect(listItemStore.getAggregateById(id)?.data?.title).to.equal('Test')
     })
   })

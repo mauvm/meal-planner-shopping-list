@@ -41,8 +41,8 @@ describe('ListListItemLabelsV1Controller', () => {
         .send({
           title: 'Test',
         })
-        .expect(HttpStatus.SEE_OTHER)
-      const id = response.header['x-resource-id']
+        .expect(HttpStatus.CREATED)
+      const id = response.body.id
 
       await request(server)
         .post(`/v1/lists/items/${id}/set-labels`)

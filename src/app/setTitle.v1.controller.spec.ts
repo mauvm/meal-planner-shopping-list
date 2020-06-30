@@ -56,8 +56,8 @@ describe('SetListItemTitleV1Controller', () => {
       const response = await request(server)
         .post('/v1/lists/items')
         .send({ title: 'Test' })
-        .expect(HttpStatus.SEE_OTHER)
-      const id = response.header['x-resource-id']
+        .expect(HttpStatus.CREATED)
+      const id = response.body.id
 
       // Execute
       await request(server)
