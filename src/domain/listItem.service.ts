@@ -9,7 +9,9 @@ export default class ListItemService {
   async create(data: { title: string }): Promise<string> {
     data.title = data.title.trim()
 
-    return this.repository.create(data)
+    const id = await this.repository.create(data)
+
+    return id
   }
 
   async findOneByIdOrFail(id: string): Promise<ListItemEntity> {

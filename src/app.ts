@@ -10,6 +10,7 @@ import {
 import glob from 'glob'
 import LoggerService from './domain/logger.service'
 import AutoLoadableStore from './infra/autoLoadableStore.interface'
+import BaseStore from './infra/base.store'
 import { Event, registerEventClass } from './infra/event.store'
 
 function debugRegisteredControllers() {
@@ -36,6 +37,12 @@ async function autoLoadStores() {
 
   for (const file of files) {
     const storeClass = require(file).default
+
+    // @todo Only load classes when they implement AutoLoadableStore
+    if (storeClass === BaseStore) {
+      continue
+    }
+
     const store = container.resolve(storeClass) as AutoLoadableStore
 
     logger.debug(`Initializing store: ${store?.constructor?.name}..`, {

@@ -1,4 +1,3 @@
-import 'mocha' // @todo Find out why VSCode gives "Cannot find name 'describe'." error without this
 import { Server } from 'http'
 import { container } from 'tsyringe'
 import { expect } from 'chai'

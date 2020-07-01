@@ -32,7 +32,7 @@ describe('ListItemService', () => {
       const promise = service.create({ title })
 
       // Test
-      await expect(promise).to.eventually.be.equal(id)
+      await expect(promise).to.eventually.equal(id)
       assert.calledOnceWithExactly(create, { title })
       expect(item.id).to.equal(id)
     })
