@@ -23,6 +23,11 @@ export default class ListService {
   async findAll(): Promise<ListEntity[]> {
     const lists = await this.repository.findAll()
 
+    // Oldest first
+    lists.sort(
+      (a, b) => Number(new Date(a.createdAt)) - Number(new Date(b.createdAt)),
+    )
+
     return lists
   }
 }

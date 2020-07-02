@@ -89,5 +89,25 @@ describe('ListService', () => {
       await expect(promise).to.eventually.deep.equal([item1, item2])
       assert.calledOnce(findAll)
     })
+
+    it('resolves to ListEntity[] that is sorted by oldest first', async () => {
+      // Data
+      const item1 = plainToClass(ListEntity, {
+        createdAt: new Date(Date.now() - 1000).toISOString(),
+      })
+      const item2 = plainToClass(ListEntity, {
+        createdAt: new Date(Date.now() - 2000).toISOString(),
+      })
+
+      // Dependencies
+      const findAll = stub(repository, 'findAll').resolves([item1, item2])
+
+      // Execute
+      const promise = service.findAll()
+
+      // Test
+      await expect(promise).to.eventually.deep.equal([item2, item1])
+      assert.calledOnce(findAll)
+    })
   })
 })
