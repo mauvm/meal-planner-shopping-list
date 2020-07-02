@@ -21,6 +21,7 @@ describe('ListItemService', () => {
   describe('should have a "create" method that', () => {
     it('resolves to an ID for the created list item', async () => {
       // Data
+      const listId = uuid()
       const id = uuid()
       const title = 'Test'
       let item = plainToClass(ListItemEntity, { id, title })
@@ -29,16 +30,17 @@ describe('ListItemService', () => {
       const create = stub(repository, 'create').resolves(id)
 
       // Execute
-      const promise = service.create({ title })
+      const promise = service.create({ listId, title })
 
       // Test
       await expect(promise).to.eventually.equal(id)
-      assert.calledOnceWithExactly(create, { title })
+      assert.calledOnceWithExactly(create, { listId, title })
       expect(item.id).to.equal(id)
     })
 
     it('trims the title', async () => {
       // Data
+      const listId = uuid()
       const id = uuid()
       const title = ' Test '
 
@@ -46,11 +48,11 @@ describe('ListItemService', () => {
       const create = stub(repository, 'create').resolves(id)
 
       // Execute
-      const promise = service.create({ title })
+      const promise = service.create({ listId, title })
 
       // Test
       await expect(promise).to.be.fulfilled
-      assert.calledOnceWithExactly(create, { title: 'Test' })
+      assert.calledOnceWithExactly(create, { listId, title: 'Test' })
     })
   })
 
@@ -76,6 +78,7 @@ describe('ListItemService', () => {
   describe('should have a "findAllUnfinished" method that', () => {
     it('resolves to ListItemEntity[] that is sorted by createdAt descending', async () => {
       // Data
+      const listId = uuid()
       const item1 = plainToClass(ListItemEntity, {
         createdAt: new Date(Date.now() - 2000),
       })
@@ -90,11 +93,11 @@ describe('ListItemService', () => {
       ])
 
       // Execute
-      const promise = service.findAllUnfinished()
+      const promise = service.findAllUnfinished(listId)
 
       // Test
       await expect(promise).to.eventually.deep.equal([item2, item1])
-      assert.calledOnce(findAllUnfinished)
+      assert.calledOnceWithExactly(findAllUnfinished, listId)
     })
   })
 
@@ -102,11 +105,13 @@ describe('ListItemService', () => {
     let searchItems: SinonStub
 
     const query = 'Foo'
+    let listId: string
     let item1: ListItemEntity
     let item2: ListItemEntity
 
     beforeEach(() => {
       // Data
+      listId = uuid()
       item1 = plainToClass(ListItemEntity, {
         id: uuid(),
         title: 'Foo',
@@ -124,11 +129,11 @@ describe('ListItemService', () => {
 
     it('returns list of items that match query', async () => {
       // Execute
-      const result = service.searchItems(query)
+      const result = service.searchItems(listId, query)
 
       // Test
       expect(result).to.deep.equal([item1, item2])
-      assert.calledOnceWithExactly(searchItems, query)
+      assert.calledOnceWithExactly(searchItems, listId, query)
     })
 
     it('returns list of found items without same titled items that have no labels', async () => {
@@ -137,11 +142,11 @@ describe('ListItemService', () => {
       item2.labels = ['bar']
 
       // Execute
-      const result = service.searchItems(query)
+      const result = service.searchItems(listId, query)
 
       // Test
       expect(result).to.deep.equal([item2])
-      assert.calledOnceWithExactly(searchItems, query)
+      assert.calledOnceWithExactly(searchItems, listId, query)
     })
 
     it('returns list of found items that have newest items first', async () => {
@@ -150,11 +155,11 @@ describe('ListItemService', () => {
       item2.createdAt = new Date(Date.now() - 1000)
 
       // Execute
-      const result = service.searchItems(query)
+      const result = service.searchItems(listId, query)
 
       // Test
       expect(result).to.deep.equal([item2, item1])
-      assert.calledOnceWithExactly(searchItems, query)
+      assert.calledOnceWithExactly(searchItems, listId, query)
     })
 
     it('returns list of found items without duplicates', async () => {
@@ -169,11 +174,11 @@ describe('ListItemService', () => {
       searchItems.returns([item1, item2, item3, item4])
 
       // Execute
-      const result = service.searchItems(query)
+      const result = service.searchItems(listId, query)
 
       // Test
       expect(result).to.deep.equal([item1, item2, item4])
-      assert.calledOnceWithExactly(searchItems, query)
+      assert.calledOnceWithExactly(searchItems, listId, query)
     })
 
     it('returns list of maximum of 20 items', async () => {
@@ -193,13 +198,13 @@ describe('ListItemService', () => {
       searchItems.returns(items)
 
       // Execute
-      const result = service.searchItems(query)
+      const result = service.searchItems(listId, query)
 
       // Test
       expect(result).to.be.an('array').with.lengthOf(20)
       expect(result[0]).to.deep.equal(items[20])
       expect(result[19]).to.deep.equal(items[1])
-      assert.calledOnceWithExactly(searchItems, query)
+      assert.calledOnceWithExactly(searchItems, listId, query)
     })
   })
 
@@ -221,20 +226,23 @@ describe('ListItemService', () => {
     })
   })
 
-  describe('should have a "listLabels" method that', () => {
+  describe('should have a "fetchAllListLabels" method that', () => {
     it('resolves when item labels have been updated', async () => {
       // Data
+      const listId = uuid()
       const labels = ['Bar', 'Foo']
 
       // Dependencies
-      const listLabels = stub(repository, 'listLabels').returns(labels)
+      const fetchAllListLabels = stub(repository, 'fetchAllListLabels').returns(
+        labels,
+      )
 
       // Execute
-      const result = service.listLabels()
+      const result = service.fetchAllListLabels(listId)
 
       // Test
       expect(result).to.deep.equal(labels)
-      assert.calledOnce(listLabels)
+      assert.calledOnceWithExactly(fetchAllListLabels, listId)
     })
   })
 

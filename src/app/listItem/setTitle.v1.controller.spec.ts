@@ -33,45 +33,88 @@ describe('SetListItemTitleV1Controller', () => {
     await cleanUpApp(server)
   })
 
-  describe('should have a PATCH /v1/lists/items/:id endpoint that', () => {
-    it('returns a 400 Bad Request on non-existant item', async () => {
+  describe('should have a PATCH /v1/lists/:listId/items/:itemId endpoint that', () => {
+    it('returns a 404 Not Found on non-existant list', async () => {
       // Data
-      const id = uuid()
+      const unknownListId = uuid()
+
+      // Dependencies
+      const response = await request(server)
+        .post('/v1/lists')
+        .send({ title: 'Test' })
+        .expect(HttpStatus.CREATED)
+      const listId = response.body.id
+
+      const response2 = await request(server)
+        .post(`/v1/lists/${listId}/items`)
+        .send({ title: 'Test' })
+        .expect(HttpStatus.CREATED)
+      const itemId = response2.body.id
 
       // Execute
-      const response = await request(server)
-        .patch(`/v1/lists/items/${id}`)
+      const response3 = await request(server)
+        .patch(`/v1/lists/${unknownListId}/items/${itemId}`)
         .send({ title: 'Other title' })
-        .expect(HttpStatus.BAD_REQUEST)
+        .expect(HttpStatus.NOT_FOUND)
+        .expect('Content-Type', /json/)
 
       // Test
-      expect(response.body.message).to.equal(
-        `No list item found for ID "${id}"`,
+      expect(response3.body.message).to.equal(
+        `No list item found for ID "${itemId}"`,
+      )
+    })
+
+    it('returns a 404 Not Found on non-existant list item', async () => {
+      // Data
+      const itemId = uuid()
+
+      // Dependencies
+      const response = await request(server)
+        .post('/v1/lists')
+        .send({ title: 'Test' })
+        .expect(HttpStatus.CREATED)
+      const listId = response.body.id
+
+      // Execute
+      const response2 = await request(server)
+        .patch(`/v1/lists/${listId}/items/${itemId}`)
+        .send({ title: 'Other title' })
+        .expect(HttpStatus.NOT_FOUND)
+        .expect('Content-Type', /json/)
+
+      // Test
+      expect(response2.body.message).to.equal(
+        `No list item found for ID "${itemId}"`,
       )
     })
 
     it('returns a 204 No Content on success', async () => {
       // Dependencies
       const listItemStore = container.resolve(ListItemStore)
+
       const response = await request(server)
-        .post('/v1/lists/items')
+        .post('/v1/lists')
         .send({ title: 'Test' })
         .expect(HttpStatus.CREATED)
-      const id = response.body.id
+      const listId = response.body.id
+
+      const response2 = await request(server)
+        .post(`/v1/lists/${listId}/items`)
+        .send({ title: 'Test' })
+        .expect(HttpStatus.CREATED)
+      const itemId = response2.body.id
 
       // Execute
       await request(server)
-        .patch(`/v1/lists/items/${id}`)
+        .patch(`/v1/lists/${listId}/items/${itemId}`)
         .send({ title: 'Other title' })
         .expect(HttpStatus.NO_CONTENT)
 
       // Test
-      const aggregate = listItemStore.getAggregateById(id)
+      const aggregate = listItemStore.getAggregateById(itemId)
       expect(aggregate?.events).to.be.an('array').with.length(2)
       expect(aggregate?.events[1]).to.be.instanceOf(ListItemTitleChanged)
       expect(aggregate?.data?.title).to.equal('Other title')
     })
-
-    // @todo Write test for non existant ID
   })
 })

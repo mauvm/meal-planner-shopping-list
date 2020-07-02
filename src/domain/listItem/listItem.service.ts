@@ -6,7 +6,7 @@ import ListItemRepository from '../../infra/listItem/listItem.repository'
 export default class ListItemService {
   constructor(private repository: ListItemRepository) {}
 
-  async create(data: { title: string }): Promise<string> {
+  async create(data: { listId: string; title: string }): Promise<string> {
     data.title = data.title.trim()
 
     const id = await this.repository.create(data)
@@ -16,11 +16,12 @@ export default class ListItemService {
 
   async findOneByIdOrFail(id: string): Promise<ListItemEntity> {
     const item = await this.repository.findOneOrFail(id)
+
     return item
   }
 
-  async findAllUnfinished(): Promise<ListItemEntity[]> {
-    const items = await this.repository.findAllUnfinished()
+  async findAllUnfinished(listId: string): Promise<ListItemEntity[]> {
+    const items = await this.repository.findAllUnfinished(listId)
 
     // Sort by creation datetime descending
     items.sort(
@@ -30,8 +31,8 @@ export default class ListItemService {
     return items
   }
 
-  searchItems(query: string): ListItemEntity[] {
-    let items = this.repository.searchItems(query)
+  searchItems(listId: string, query: string): ListItemEntity[] {
+    let items = this.repository.searchItems(listId, query)
 
     // Remove items with no labels when there are
     // other items with the same title that do have labels
@@ -82,8 +83,8 @@ export default class ListItemService {
     await this.repository.setTitle(id, title)
   }
 
-  listLabels(): string[] {
-    return this.repository.listLabels()
+  fetchAllListLabels(listId: string): string[] {
+    return this.repository.fetchAllListLabels(listId)
   }
 
   async setLabels(id: string, labels: string[]): Promise<void> {

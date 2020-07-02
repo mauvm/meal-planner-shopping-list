@@ -13,6 +13,9 @@ export default class ListItemEntity {
   @IsUUID()
   id: string
 
+  @IsUUID()
+  listId: string
+
   @IsNotEmpty()
   @IsString()
   title: string

@@ -2,11 +2,11 @@ import { AssertionError } from 'assert'
 import { singleton } from 'tsyringe'
 import {
   JsonController,
-  Post,
+  Put,
   OnUndefined,
   Params,
   Body,
-  BadRequestError,
+  NotFoundError,
 } from 'routing-controllers'
 import { IsUUID, IsArray, IsString, IsNotEmpty } from 'class-validator'
 import HttpStatus from 'http-status-codes'
@@ -15,7 +15,10 @@ import ListItemCreated from '../../domain/listItem/listItemCreated.event'
 
 class SetItemLabelsRequestParamsDTO {
   @IsUUID()
-  id: string
+  listId: string
+
+  @IsUUID()
+  itemId: string
 }
 
 class SetItemLabelsRequestBodyDTO {
@@ -26,24 +29,30 @@ class SetItemLabelsRequestBodyDTO {
 }
 
 @singleton()
-@JsonController('/v1/lists/items')
+@JsonController('/v1/lists')
 export default class SetListItemLabelsV1Controller {
   constructor(private service: ListItemService) {}
 
-  @Post('/:id/set-labels')
+  @Put('/:listId/items/:itemId/labels')
   @OnUndefined(HttpStatus.NO_CONTENT)
   async fetch(
-    @Params() { id }: SetItemLabelsRequestParamsDTO,
+    @Params() { listId, itemId }: SetItemLabelsRequestParamsDTO,
     @Body() { labels }: SetItemLabelsRequestBodyDTO,
   ): Promise<void> {
     try {
-      await this.service.setLabels(id, labels)
+      const item = await this.service.findOneByIdOrFail(itemId)
+
+      if (item.listId !== listId) {
+        throw new NotFoundError(`No list item found for ID "${itemId}"`)
+      }
+
+      await this.service.setLabels(item.id, labels)
     } catch (err) {
       if (
         err instanceof AssertionError &&
         err.expected === ListItemCreated.name
       ) {
-        throw new BadRequestError(`No list item found for ID "${id}"`)
+        throw new NotFoundError(`No list item found for ID "${itemId}"`)
       }
 
       throw err

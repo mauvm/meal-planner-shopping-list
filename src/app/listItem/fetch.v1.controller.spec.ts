@@ -6,10 +6,8 @@ import HttpStatus from 'http-status-codes'
 import { uuid } from 'uuidv4'
 import { createApp, cleanUpApp } from '../../app'
 import ConfigService from '../../domain/config.service'
-import ListItemCreated from '../../domain/listItem/listItemCreated.event'
 import EventMockStore from '../../infra/event.store.mock'
 import EventStore from '../../infra/event.store'
-import ListItemStore from '../../infra/listItem/listItem.store'
 
 describe('FetchListItemV1Controller', () => {
   let server: Server
@@ -33,41 +31,85 @@ describe('FetchListItemV1Controller', () => {
     await cleanUpApp(server)
   })
 
-  describe('should have a GET /v1/lists/items/:id endpoint that', () => {
-    it('returns a 400 Bad Request on non-existant item', async () => {
+  describe('should have a GET /v1/lists/:listId/items/:itemId endpoint that', () => {
+    it('returns a 404 Not Found on non-existant list', async () => {
       // Data
-      const id = uuid()
+      const unknownListId = uuid()
+
+      // Dependencies
+      const response = await request(server)
+        .post('/v1/lists')
+        .send({ title: 'Test' })
+        .expect(HttpStatus.CREATED)
+      const listId = response.body.id
+
+      const response2 = await request(server)
+        .post(`/v1/lists/${listId}/items`)
+        .send({ title: 'Test' })
+        .expect(HttpStatus.CREATED)
+      const itemId = response2.body.id
 
       // Execute
-      const response = await request(server)
-        .get(`/v1/lists/items/${id}`)
-        .expect(HttpStatus.BAD_REQUEST)
+      const response3 = await request(server)
+        .get(`/v1/lists/${unknownListId}/items/${itemId}`)
+        .expect(HttpStatus.NOT_FOUND)
+        .expect('Content-Type', /json/)
 
       // Test
-      expect(response.body.message).to.equal(
-        `No list item found for ID "${id}"`,
+      expect(response3.body.message).to.equal(
+        `No list item found for ID "${itemId}"`,
+      )
+    })
+
+    it('returns a 404 Not Found on non-existant list item', async () => {
+      // Data
+      const itemId = uuid()
+
+      // Dependencies
+      const response = await request(server)
+        .post('/v1/lists')
+        .send({ title: 'Test' })
+        .expect(HttpStatus.CREATED)
+      const listId = response.body.id
+
+      // Execute
+      const response2 = await request(server)
+        .get(`/v1/lists/${listId}/items/${itemId}`)
+        .expect(HttpStatus.NOT_FOUND)
+        .expect('Content-Type', /json/)
+
+      // Test
+      expect(response2.body.message).to.equal(
+        `No list item found for ID "${itemId}"`,
       )
     })
 
     it('returns a 200 OK with list item', async () => {
       // Data
-      const id = uuid()
       const data = { title: 'Test' }
-      const createdEvent = new ListItemCreated('1', id, data)
 
       // Dependencies
-      const listItemStore = container.resolve(ListItemStore)
-      listItemStore.handleEvent(createdEvent)
+      const response = await request(server)
+        .post('/v1/lists')
+        .send({ title: 'Test' })
+        .expect(HttpStatus.CREATED)
+      const listId = response.body.id
+
+      const response2 = await request(server)
+        .post(`/v1/lists/${listId}/items`)
+        .send(data)
+        .expect(HttpStatus.CREATED)
+      const itemId = response2.body.id
 
       // Execute
-      const response = await request(server)
-        .get(`/v1/lists/items/${id}`)
+      const response3 = await request(server)
+        .get(`/v1/lists/${listId}/items/${itemId}`)
         .expect(HttpStatus.OK)
         .expect('Content-Type', /json/)
 
       // Test
-      const item = response.body?.data
-      expect(item?.id).to.equal(id)
+      const item = response3.body?.data
+      expect(item?.id).to.equal(itemId)
       expect(item?.title).to.equal(data.title)
     })
   })

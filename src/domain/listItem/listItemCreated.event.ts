@@ -4,12 +4,17 @@ export default class ListItemCreated extends Event {
   static readonly type = 'list-item-created'
   readonly type = ListItemCreated.type
 
-  readonly data: { id: string; title: string; createdAt: string }
+  readonly data: {
+    id: string
+    listId?: string
+    title: string
+    createdAt: string
+  }
 
   constructor(
     readonly eventId: string | null,
     readonly aggregateId: string,
-    data: { title: string; createdAt?: string },
+    data: { title: string; listId?: string; createdAt?: string },
   ) {
     super(eventId, aggregateId, data)
 

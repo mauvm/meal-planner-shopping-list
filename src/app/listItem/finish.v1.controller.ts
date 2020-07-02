@@ -5,7 +5,7 @@ import {
   Post,
   OnUndefined,
   Params,
-  BadRequestError,
+  NotFoundError,
 } from 'routing-controllers'
 import { IsUUID } from 'class-validator'
 import HttpStatus from 'http-status-codes'
@@ -14,25 +14,36 @@ import ListItemCreated from '../../domain/listItem/listItemCreated.event'
 
 class FinishRequestParamsDTO {
   @IsUUID()
-  id: string
+  listId: string
+
+  @IsUUID()
+  itemId: string
 }
 
 @singleton()
-@JsonController('/v1/lists/items')
+@JsonController('/v1/lists')
 export default class FinishListItemV1Controller {
   constructor(private service: ListItemService) {}
 
-  @Post('/:id/finish')
+  @Post('/:listId/items/:itemId/finish')
   @OnUndefined(HttpStatus.NO_CONTENT)
-  async finish(@Params() { id }: FinishRequestParamsDTO): Promise<void> {
+  async finish(
+    @Params() { listId, itemId }: FinishRequestParamsDTO,
+  ): Promise<void> {
     try {
-      await this.service.finish(id)
+      const item = await this.service.findOneByIdOrFail(itemId)
+
+      if (item.listId !== listId) {
+        throw new NotFoundError(`No list item found for ID "${itemId}"`)
+      }
+
+      await this.service.finish(item.id)
     } catch (err) {
       if (
         err instanceof AssertionError &&
         err.expected === ListItemCreated.name
       ) {
-        throw new BadRequestError(`No list item found for ID "${id}"`)
+        throw new NotFoundError(`No list item found for ID "${itemId}"`)
       }
 
       throw err

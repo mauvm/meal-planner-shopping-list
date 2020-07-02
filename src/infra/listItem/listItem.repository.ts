@@ -1,7 +1,9 @@
 import { singleton } from 'tsyringe'
 import { uuid } from 'uuidv4'
 import { plainToClass } from 'class-transformer'
+import ListStore from '../list/list.store'
 import ListItemStore from './listItem.store'
+import ListCreated from '../../domain/list/listCreated.event'
 import ListItemCreated from '../../domain/listItem/listItemCreated.event'
 import ListItemEntity from '../../domain/listItem/listItem.entity'
 import ListItemFinished from '../../domain/listItem/listItemFinished.event'
@@ -10,9 +12,14 @@ import ListItemTitleChanged from '../../domain/listItem/listItemTitleChanged.eve
 
 @singleton()
 export default class ListItemRepository {
-  constructor(private listItemStore: ListItemStore) {}
+  constructor(
+    private listStore: ListStore,
+    private listItemStore: ListItemStore,
+  ) {}
 
-  async create(data: { title: string }): Promise<string> {
+  async create(data: { listId: string; title: string }): Promise<string> {
+    this.listStore.assertObservedEvent(data.listId, ListCreated)
+
     const aggregateId = uuid()
     const event = new ListItemCreated(null, aggregateId, data)
 
@@ -44,11 +51,14 @@ export default class ListItemRepository {
     await this.listItemStore.persistEvent(event)
   }
 
-  listLabels(): string[] {
+  fetchAllListLabels(listId: string): string[] {
     const labels: string[] = []
 
     for (const aggregate of this.listItemStore.getAggregates().values()) {
-      if (Array.isArray(aggregate.data.labels)) {
+      if (
+        aggregate.data.listId === listId &&
+        Array.isArray(aggregate.data.labels)
+      ) {
         labels.push(...aggregate.data.labels)
       }
     }
@@ -58,21 +68,29 @@ export default class ListItemRepository {
       .filter((value, index, self) => self.indexOf(value) === index) // Unique
   }
 
-  async findAllUnfinished(): Promise<ListItemEntity[]> {
+  async findAllUnfinished(listId: string): Promise<ListItemEntity[]> {
+    this.listStore.assertObservedEvent(listId, ListCreated)
+
     const aggregates = Array.from(
       this.listItemStore.getAggregates().values(),
-    ).filter((item: any) => !item.data.finishedAt)
+    ).filter(
+      (item: any) => item.data.listId === listId && !item.data.finishedAt,
+    )
 
     return aggregates.map((aggregate) =>
       plainToClass(ListItemEntity, aggregate.data),
     )
   }
 
-  searchItems(query: string): ListItemEntity[] {
+  searchItems(listId: string, query: string): ListItemEntity[] {
+    this.listStore.assertObservedEvent(listId, ListCreated)
+
     const aggregates = Array.from(
       this.listItemStore.getAggregates().values(),
-    ).filter((item: any) =>
-      item.data.title?.toLowerCase().includes(query.toLowerCase()),
+    ).filter(
+      (item: any) =>
+        item.data.listId === listId &&
+        item.data.title?.toLowerCase().includes(query.toLowerCase()),
     )
 
     return aggregates.map((aggregate) =>

@@ -6,11 +6,8 @@ import HttpStatus from 'http-status-codes'
 import { uuid } from 'uuidv4'
 import { createApp, cleanUpApp } from '../../app'
 import ConfigService from '../../domain/config.service'
-import ListItemFinished from '../../domain/listItem/listItemFinished.event'
-import ListItemCreated from '../../domain/listItem/listItemCreated.event'
 import EventMockStore from '../../infra/event.store.mock'
 import EventStore from '../../infra/event.store'
-import ListItemStore from '../../infra/listItem/listItem.store'
 
 describe('ListUnfinishedListItemV1Controller', () => {
   let server: Server
@@ -34,43 +31,62 @@ describe('ListUnfinishedListItemV1Controller', () => {
     await cleanUpApp(server)
   })
 
-  describe('should have a GET /v1/lists/unfinished-items endpoint that', () => {
-    it('returns a 200 OK with unfinished list items', async () => {
+  describe('should have a GET /v1/lists/:listId/unfinished-items endpoint that', () => {
+    it('returns a 404 Not Found on non-existant list', async () => {
       // Data
-      const aggregateId1 = uuid()
-      const aggregateId2 = uuid()
-      const aggregateId3 = uuid()
-      const createEvent1 = new ListItemCreated('1', aggregateId1, {
-        title: 'Item 1',
-      })
-      const createEvent2 = new ListItemCreated('2', aggregateId2, {
-        title: 'Item 2',
-      })
-      const finishEvent = new ListItemFinished('3', aggregateId2)
-
-      await new Promise((resolve) => setTimeout(resolve, 10)) // event2 must be after event1
-      const createEvent3 = new ListItemCreated('4', aggregateId3, {
-        title: 'Item 3',
-      })
-
-      // Dependencies
-      const listItemStore = container.resolve(ListItemStore)
-      listItemStore.handleEvent(createEvent1)
-      listItemStore.handleEvent(createEvent2)
-      listItemStore.handleEvent(finishEvent)
-      listItemStore.handleEvent(createEvent3)
+      const listId = uuid()
 
       // Execute
       const response = await request(server)
-        .get('/v1/lists/unfinished-items')
+        .get(`/v1/lists/${listId}/unfinished-items`)
+        .expect(HttpStatus.NOT_FOUND)
+        .expect('Content-Type', /json/)
+
+      // Test
+      expect(response.body.message).to.equal(`No list found for ID "${listId}"`)
+    })
+
+    it('returns a 200 OK with unfinished list items', async () => {
+      // Dependencies
+      const response = await request(server)
+        .post('/v1/lists')
+        .send({ title: 'Test' })
+        .expect(HttpStatus.CREATED)
+      const listId = response.body.id
+
+      const response2 = await request(server)
+        .post(`/v1/lists/${listId}/items`)
+        .send({ title: 'Item 1' })
+        .expect(HttpStatus.CREATED)
+      const itemId1 = response2.body.id
+
+      const response3 = await request(server)
+        .post(`/v1/lists/${listId}/items`)
+        .send({ title: 'Item 2' })
+        .expect(HttpStatus.CREATED)
+      const itemId2 = response3.body.id
+
+      const response4 = await request(server)
+        .post(`/v1/lists/${listId}/items`)
+        .send({ title: 'Item 3' })
+        .expect(HttpStatus.CREATED)
+      const itemId3 = response4.body.id
+
+      await request(server)
+        .post(`/v1/lists/${listId}/items/${itemId2}/finish`)
+        .expect(HttpStatus.NO_CONTENT)
+
+      // Execute
+      const response5 = await request(server)
+        .get(`/v1/lists/${listId}/unfinished-items`)
         .expect(HttpStatus.OK)
         .expect('Content-Type', /json/)
 
       // Test
-      expect(response.body?.data).to.be.an('array').with.length(2)
-      expect(response.body?.data.map((item: any) => item.id)).to.deep.equal([
-        aggregateId3,
-        aggregateId1,
+      expect(response5.body?.data).to.be.an('array').with.length(2)
+      expect(response5.body?.data.map((item: any) => item.id)).to.deep.equal([
+        itemId3,
+        itemId1,
       ])
     })
   })

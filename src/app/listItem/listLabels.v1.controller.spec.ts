@@ -30,31 +30,31 @@ describe('ListItemLabelsV1Controller', () => {
     await cleanUpApp(server)
   })
 
-  describe('should have a GET /v1/lists/list-items-labels endpoint that', () => {
+  describe('should have a GET /v1/lists/:listId/items-labels endpoint that', () => {
     it('returns a 200 OK with list of labels on success', async () => {
       // Data
       const labels = ['Foo', 'Bar']
 
       // Dependencies
       const response = await request(server)
-        .post('/v1/lists/items')
-        .send({
-          title: 'Test',
-        })
+        .post('/v1/lists')
+        .send({ title: 'Test' })
         .expect(HttpStatus.CREATED)
-      const id = response.body.id
+      const listId = response.body.id
 
       await request(server)
-        .post(`/v1/lists/items/${id}/set-labels`)
+        .post(`/v1/lists/${listId}/items`)
         .send({
+          title: 'Test',
           labels,
         })
-        .expect(HttpStatus.NO_CONTENT)
+        .expect(HttpStatus.CREATED)
 
       // Execute
       const { body } = await request(server)
-        .get('/v1/lists/list-items-labels')
+        .get(`/v1/lists/${listId}/items-labels`)
         .expect(HttpStatus.OK)
+        .expect('Content-Type', /json/)
 
       // Test
       expect(body).to.deep.equal({ data: labels.sort() })
