@@ -3,13 +3,13 @@ import { container } from 'tsyringe'
 import { expect } from 'chai'
 import request from 'supertest'
 import HttpStatus from 'http-status-codes'
-import { createApp, cleanUpApp } from '../app'
-import ConfigService from '../domain/config.service'
-import ListStore from '../infra/list.store'
-import EventStore from '../infra/event.store'
-import EventMockStore from '../infra/event.store.mock'
+import { createApp, cleanUpApp } from '../../app'
+import ConfigService from '../../domain/config.service'
+import EventStore from '../../infra/event.store'
+import EventMockStore from '../../infra/event.store.mock'
+import ListItemStore from '../../infra/listItem/listItem.store'
 
-describe('CreateListV1Controller', () => {
+describe('CreateListItemV1Controller', () => {
   let server: Server
   let config: ConfigService
   let eventStore: EventStore
@@ -31,14 +31,14 @@ describe('CreateListV1Controller', () => {
     await cleanUpApp(server)
   })
 
-  describe('should have a POST /v1/lists endpoint that', () => {
+  describe('should have a POST /v1/lists/items endpoint that', () => {
     it('returns a 400 Bad Request on a title that is too long (over 300 characters)', async () => {
       // Data
       const tooLongTitle = Array(301).fill('a').join('')
 
       // Execute
       const response = await request(server)
-        .post('/v1/lists')
+        .post('/v1/lists/items')
         .send({ title: tooLongTitle })
         .expect(HttpStatus.BAD_REQUEST)
 
@@ -52,11 +52,11 @@ describe('CreateListV1Controller', () => {
 
     it('returns a 201 Created with new item ID', async () => {
       // Dependencies
-      const listStore = container.resolve(ListStore)
+      const listItemStore = container.resolve(ListItemStore)
 
       // Execute
       const response = await request(server)
-        .post('/v1/lists')
+        .post('/v1/lists/items')
         .send({ title: 'Test' })
         .expect(HttpStatus.CREATED)
 
@@ -64,7 +64,26 @@ describe('CreateListV1Controller', () => {
       const id = response.header['x-resource-id']
       expect(id).to.be.a('string').that.is.not.empty
       expect(response.body).to.deep.equal({ id })
-      expect(listStore.getAggregateById(id)?.data?.title).to.equal('Test')
+      expect(listItemStore.getAggregateById(id)?.data?.title).to.equal('Test')
+    })
+
+    it('returns a 201 Created with new item that has given labels', async () => {
+      // Dependencies
+      const listItemStore = container.resolve(ListItemStore)
+
+      // Execute
+      const response = await request(server)
+        .post('/v1/lists/items')
+        .send({ title: 'Test', labels: ['Foo ', '\tBar'] })
+        .expect(HttpStatus.CREATED)
+
+      // Test
+      const id = response.body.id
+      expect(id).to.be.a('string').that.is.not.empty
+      expect(listItemStore.getAggregateById(id)?.data?.labels).to.deep.equal([
+        'Bar',
+        'Foo',
+      ])
     })
   })
 })

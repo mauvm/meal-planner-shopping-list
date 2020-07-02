@@ -5,8 +5,8 @@ import {
   QueryParam,
   BadRequestError,
 } from 'routing-controllers'
-import ListItemService from '../domain/listItem.service'
-import ListItemEntity from '../domain/listItem.entity'
+import ListItemService from '../../domain/listItem/listItem.service'
+import ListItemEntity from '../../domain/listItem/listItem.entity'
 
 class SearchItemsResponseDTO {
   data: ListItemEntity[]

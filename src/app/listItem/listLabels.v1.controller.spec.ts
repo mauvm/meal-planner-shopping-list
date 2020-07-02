@@ -3,12 +3,12 @@ import { container } from 'tsyringe'
 import { expect } from 'chai'
 import request from 'supertest'
 import HttpStatus from 'http-status-codes'
-import { createApp, cleanUpApp } from '../app'
-import ConfigService from '../domain/config.service'
-import EventStore from '../infra/event.store'
-import EventMockStore from '../infra/event.store.mock'
+import { createApp, cleanUpApp } from '../../app'
+import ConfigService from '../../domain/config.service'
+import EventStore from '../../infra/event.store'
+import EventMockStore from '../../infra/event.store.mock'
 
-describe('ListListItemLabelsV1Controller', () => {
+describe('ListItemLabelsV1Controller', () => {
   let server: Server
   let config: ConfigService
   let eventStore: EventStore

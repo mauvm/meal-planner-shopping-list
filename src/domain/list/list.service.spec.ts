@@ -5,7 +5,7 @@ import { uuid } from 'uuidv4'
 import { plainToClass } from 'class-transformer'
 import ListService from './list.service'
 import ListEntity from './list.entity'
-import ListRepository from '../../infra/list.repository'
+import ListRepository from '../../infra/list/list.repository'
 
 describe('ListService', () => {
   let service: ListService

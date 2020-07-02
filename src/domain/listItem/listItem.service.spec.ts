@@ -4,8 +4,8 @@ import { expect } from 'chai'
 import { uuid } from 'uuidv4'
 import { plainToClass, classToClass } from 'class-transformer'
 import ListItemService from './listItem.service'
-import ListItemRepository from '../infra/listItem.repository'
-import ListItemEntity from '../domain/listItem.entity'
+import ListItemEntity from './listItem.entity'
+import ListItemRepository from '../../infra/listItem/listItem.repository'
 
 describe('ListItemService', () => {
   let service: ListItemService

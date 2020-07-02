@@ -1,4 +1,4 @@
-import { Event } from '../infra/event.store'
+import { Event } from '../../infra/event.store'
 
 export default class ListItemCreated extends Event {
   static readonly type = 'list-item-created'

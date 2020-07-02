@@ -1,6 +1,6 @@
 import { singleton } from 'tsyringe'
 import ListEntity from './list.entity'
-import ListRepository from '../../infra/list.repository'
+import ListRepository from '../../infra/list/list.repository'
 
 @singleton()
 export default class ListService {

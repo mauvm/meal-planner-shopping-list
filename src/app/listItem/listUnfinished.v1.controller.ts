@@ -1,8 +1,8 @@
 import { singleton } from 'tsyringe'
 import { JsonController, Get } from 'routing-controllers'
 import { plainToClass } from 'class-transformer'
-import ListItemService from '../domain/listItem.service'
-import ListItemEntity from '../domain/listItem.entity'
+import ListItemService from '../../domain/listItem/listItem.service'
+import ListItemEntity from '../../domain/listItem/listItem.entity'
 
 class ListUnfinishedResponseDTO {
   data: ListItemEntity[]

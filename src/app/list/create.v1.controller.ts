@@ -3,7 +3,7 @@ import { JsonController, Post, Body, Res } from 'routing-controllers'
 import { IsNotEmpty, IsString, IsArray, MaxLength } from 'class-validator'
 import { Response } from 'koa'
 import HttpStatus from 'http-status-codes'
-import ListService from '../domain/list/list.service'
+import ListService from '../../domain/list/list.service'
 
 class CreateRequestParamsDTO {
   @IsNotEmpty()

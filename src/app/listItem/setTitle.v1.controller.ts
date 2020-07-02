@@ -1,3 +1,4 @@
+import { AssertionError } from 'assert'
 import { singleton } from 'tsyringe'
 import {
   JsonController,
@@ -9,9 +10,8 @@ import {
 } from 'routing-controllers'
 import { IsUUID, IsString } from 'class-validator'
 import HttpStatus from 'http-status-codes'
-import { AssertionError } from 'assert'
-import ListItemService from '../domain/listItem.service'
-import ListItemCreated from '../domain/listItemCreated.event'
+import ListItemService from '../../domain/listItem/listItem.service'
+import ListItemCreated from '../../domain/listItem/listItemCreated.event'
 
 class SetItemTitleRequestParamsDTO {
   @IsUUID()

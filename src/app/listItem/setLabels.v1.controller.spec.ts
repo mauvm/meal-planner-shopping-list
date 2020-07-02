@@ -4,14 +4,14 @@ import { expect } from 'chai'
 import request from 'supertest'
 import HttpStatus from 'http-status-codes'
 import { uuid } from 'uuidv4'
-import ListItemTitleChanged from '../domain/listItemTitleChanged.event'
-import { createApp, cleanUpApp } from '../app'
-import ConfigService from '../domain/config.service'
-import EventStore from '../infra/event.store'
-import EventMockStore from '../infra/event.store.mock'
-import ListItemStore from '../infra/listItem.store'
+import { createApp, cleanUpApp } from '../../app'
+import ConfigService from '../../domain/config.service'
+import ListItemLabelsChanged from '../../domain/listItem/listItemLabelsChanged.event'
+import EventStore from '../../infra/event.store'
+import EventMockStore from '../../infra/event.store.mock'
+import ListItemStore from '../../infra/listItem/listItem.store'
 
-describe('SetListItemTitleV1Controller', () => {
+describe('SetListItemLabelsV1Controller', () => {
   let server: Server
   let config: ConfigService
   let eventStore: EventStore
@@ -33,15 +33,15 @@ describe('SetListItemTitleV1Controller', () => {
     await cleanUpApp(server)
   })
 
-  describe('should have a PATCH /v1/lists/items/:id endpoint that', () => {
+  describe('should have a POST /v1/lists/items/:id/set-labels endpoint that', () => {
     it('returns a 400 Bad Request on non-existant item', async () => {
       // Data
       const id = uuid()
 
       // Execute
       const response = await request(server)
-        .patch(`/v1/lists/items/${id}`)
-        .send({ title: 'Other title' })
+        .post(`/v1/lists/items/${id}/set-labels`)
+        .send({ labels: ['Foo', 'Bar'] })
         .expect(HttpStatus.BAD_REQUEST)
 
       // Test
@@ -61,17 +61,16 @@ describe('SetListItemTitleV1Controller', () => {
 
       // Execute
       await request(server)
-        .patch(`/v1/lists/items/${id}`)
-        .send({ title: 'Other title' })
+        .post(`/v1/lists/items/${id}/set-labels`)
+        .send({ labels: ['Foo', 'Bar'] })
         .expect(HttpStatus.NO_CONTENT)
 
       // Test
       const aggregate = listItemStore.getAggregateById(id)
       expect(aggregate?.events).to.be.an('array').with.length(2)
-      expect(aggregate?.events[1]).to.be.instanceOf(ListItemTitleChanged)
-      expect(aggregate?.data?.title).to.equal('Other title')
+      expect(aggregate?.events[1]).to.be.instanceOf(ListItemLabelsChanged)
+      expect(aggregate?.data?.title).to.equal('Test')
+      expect(aggregate?.data?.labels).to.deep.equal(['Bar', 'Foo'])
     })
-
-    // @todo Write test for non existant ID
   })
 })

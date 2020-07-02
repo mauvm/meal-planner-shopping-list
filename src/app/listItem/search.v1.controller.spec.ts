@@ -4,10 +4,10 @@ import { expect } from 'chai'
 import { assert, match } from 'sinon'
 import request from 'supertest'
 import HttpStatus from 'http-status-codes'
-import { createApp, cleanUpApp } from '../app'
-import ConfigService from '../domain/config.service'
-import EventStore from '../infra/event.store'
-import EventMockStore from '../infra/event.store.mock'
+import { createApp, cleanUpApp } from '../../app'
+import ConfigService from '../../domain/config.service'
+import EventStore from '../../infra/event.store'
+import EventMockStore from '../../infra/event.store.mock'
 
 describe('SearchListItemV1Controller', () => {
   let server: Server

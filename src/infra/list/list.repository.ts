@@ -2,8 +2,8 @@ import { singleton } from 'tsyringe'
 import { uuid } from 'uuidv4'
 import { plainToClass } from 'class-transformer'
 import ListStore from './list.store'
-import ListEntity from '../domain/list/list.entity'
-import ListCreated from '../domain/list/listCreated.event'
+import ListEntity from '../../domain/list/list.entity'
+import ListCreated from '../../domain/list/listCreated.event'
 
 @singleton()
 export default class ListRepository {

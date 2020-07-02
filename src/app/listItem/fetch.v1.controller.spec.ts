@@ -4,12 +4,12 @@ import { expect } from 'chai'
 import request from 'supertest'
 import HttpStatus from 'http-status-codes'
 import { uuid } from 'uuidv4'
-import { createApp, cleanUpApp } from '../app'
-import ConfigService from '../domain/config.service'
-import ListItemStore from '../infra/listItem.store'
-import ListItemCreated from '../domain/listItemCreated.event'
-import EventMockStore from '../infra/event.store.mock'
-import EventStore from '../infra/event.store'
+import { createApp, cleanUpApp } from '../../app'
+import ConfigService from '../../domain/config.service'
+import ListItemCreated from '../../domain/listItem/listItemCreated.event'
+import EventMockStore from '../../infra/event.store.mock'
+import EventStore from '../../infra/event.store'
+import ListItemStore from '../../infra/listItem/listItem.store'
 
 describe('FetchListItemV1Controller', () => {
   let server: Server
