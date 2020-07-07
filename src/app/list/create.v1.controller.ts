@@ -1,6 +1,6 @@
 import { singleton } from 'tsyringe'
 import { JsonController, Post, Body, Res } from 'routing-controllers'
-import { IsNotEmpty, IsString, IsArray, MaxLength } from 'class-validator'
+import { IsNotEmpty, IsString, MaxLength } from 'class-validator'
 import { Response } from 'koa'
 import HttpStatus from 'http-status-codes'
 import ListService from '../../domain/list/list.service'
@@ -10,10 +10,6 @@ class CreateRequestParamsDTO {
   @IsString()
   @MaxLength(300)
   title: string
-
-  @IsArray()
-  @IsString({ each: true })
-  labels: string[] = []
 }
 
 @singleton()

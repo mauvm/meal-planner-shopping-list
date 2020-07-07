@@ -50,7 +50,7 @@ describe('CreateListV1Controller', () => {
       })
     })
 
-    it('returns a 201 Created with new item ID', async () => {
+    it('returns a 201 Created with new list ID', async () => {
       // Dependencies
       const listStore = container.resolve(ListStore)
 

@@ -78,7 +78,7 @@ describe('CreateListItemV1Controller', () => {
       })
     })
 
-    it('returns a 201 Created with new item ID', async () => {
+    it('returns a 201 Created with new list item ID', async () => {
       // Dependencies
       const listItemStore = container.resolve(ListItemStore)
 
@@ -96,7 +96,7 @@ describe('CreateListItemV1Controller', () => {
       expect(listItemStore.getAggregateById(id)?.data?.title).to.equal('Test')
     })
 
-    it('returns a 201 Created with new item that has given labels', async () => {
+    it('returns a 201 Created with new list item that has given labels', async () => {
       // Dependencies
       const listItemStore = container.resolve(ListItemStore)
 
