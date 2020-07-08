@@ -127,31 +127,32 @@ export default class EventStore implements AutoLoadableStore {
   }
 
   catchUpStream(streamName: string, callback: EventCallback): void {
-    this.client.subscribeToAllFrom(null, false, (subscription, event) => {
-      if (event?.originalEvent?.eventStreamId !== streamName) {
-        return
-      }
+    this.client.subscribeToStreamFrom(
+      streamName,
+      null,
+      false,
+      (subscription, event) => {
+        const eventId = event!.event!.eventId
+        const type = String(event!.event!.eventType)
+        const data = JSON.parse(event!.event!.data!.toString('utf8'))
 
-      const eventId = event!.event!.eventId
-      const type = String(event!.event!.eventType)
-      const data = JSON.parse(event!.event!.data!.toString('utf8'))
+        let eventClass = eventClasses.find(
+          (eventClass) => eventClass.type === type,
+        )
 
-      let eventClass = eventClasses.find(
-        (eventClass) => eventClass.type === type,
-      )
+        if (!eventClass) {
+          this.logger.error(`No event handler for "${type}"`, {
+            streamName,
+            eventId,
+            type,
+            data,
+          })
+          return
+        }
 
-      if (!eventClass) {
-        this.logger.error(`No event handler for "${type}"`, {
-          streamName,
-          eventId,
-          type,
-          data,
-        })
-        return
-      }
-
-      const observedEvent = new eventClass(eventId, data.id, data)
-      callback(observedEvent)
-    })
+        const observedEvent = new eventClass(eventId, data.id, data)
+        callback(observedEvent)
+      },
+    )
   }
 }
