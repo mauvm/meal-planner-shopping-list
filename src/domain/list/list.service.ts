@@ -1,15 +1,20 @@
 import { singleton } from 'tsyringe'
 import ListEntity from './list.entity'
+import UserEntity from '../user.entity'
 import ListRepository from '../../infra/list/list.repository'
 
 @singleton()
 export default class ListService {
   constructor(private repository: ListRepository) {}
 
-  async create(data: { title: string }): Promise<string> {
-    data.title = data.title.trim()
-
-    const id = await this.repository.create(data)
+  async create(data: { title: string }, user: UserEntity): Promise<string> {
+    const id = await this.repository.create(
+      {
+        title: data.title.trim(),
+        owners: [user.id],
+      },
+      user,
+    )
 
     return id
   }
@@ -20,8 +25,8 @@ export default class ListService {
     return item
   }
 
-  async findAll(): Promise<ListEntity[]> {
-    const lists = await this.repository.findAll()
+  async findAllForUser(user: UserEntity): Promise<ListEntity[]> {
+    const lists = await this.repository.findAllForUser(user)
 
     // Oldest first
     lists.sort(

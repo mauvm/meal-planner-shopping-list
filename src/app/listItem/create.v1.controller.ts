@@ -7,6 +7,8 @@ import {
   Res,
   Params,
   NotFoundError,
+  Authorized,
+  CurrentUser,
 } from 'routing-controllers'
 import {
   IsUUID,
@@ -17,6 +19,7 @@ import {
 } from 'class-validator'
 import { Response } from 'koa'
 import HttpStatus from 'http-status-codes'
+import UserEntity from '../../domain/user.entity'
 import ListItemService from '../../domain/listItem/listItem.service'
 import ListCreated from '../../domain/list/listCreated.event'
 
@@ -41,17 +44,19 @@ class CreateRequestBodyDTO {
 export default class CreateListItemV1Controller {
   constructor(private service: ListItemService) {}
 
+  @Authorized('list-items:create')
   @Post('/:listId/items')
   async create(
+    @CurrentUser() user: UserEntity,
     @Params() { listId }: CreateRequestParamsDTO,
     @Body() data: CreateRequestBodyDTO,
     @Res() res: Response,
   ): Promise<Response> {
     try {
-      const id = await this.service.create({ listId, title: data.title })
+      const id = await this.service.create({ listId, title: data.title }, user)
 
       if (data.labels.length > 0) {
-        await this.service.setLabels(id, data.labels)
+        await this.service.setLabels(id, data.labels, user)
       }
 
       res.set('Access-Control-Expose-Headers', 'X-Resource-Id')

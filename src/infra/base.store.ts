@@ -1,6 +1,7 @@
 import assert, { AssertionError } from 'assert'
 import { EventEmitter } from 'typed-ts-events'
 import EventStore, { Event } from './event.store'
+import UserEntity from '../domain/user.entity'
 
 export type Aggregate = {
   data: any
@@ -105,8 +106,12 @@ export default class BaseStore {
     })
   }
 
-  async persistEvent(event: Event): Promise<void> {
-    const eventId = await this.eventStore.persistEvent(this.streamName, event)
+  async persistEvent(event: Event, user: UserEntity): Promise<void> {
+    const eventId = await this.eventStore.persistEvent(
+      this.streamName,
+      event,
+      user,
+    )
     await this.waitForEventFromStore(eventId)
   }
 }

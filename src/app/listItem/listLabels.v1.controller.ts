@@ -1,7 +1,19 @@
+import { AssertionError } from 'assert'
 import { singleton } from 'tsyringe'
-import { JsonController, Get, Params } from 'routing-controllers'
+import {
+  JsonController,
+  Get,
+  Params,
+  Authorized,
+  CurrentUser,
+  UnauthorizedError,
+  NotFoundError,
+} from 'routing-controllers'
 import { IsUUID } from 'class-validator'
+import UserEntity from '../../domain/user.entity'
+import ListService from '../../domain/list/list.service'
 import ListItemService from '../../domain/listItem/listItem.service'
+import ListCreated from '../../domain/list/listCreated.event'
 
 class FetchItemsLabelsRequestParamsDTO {
   @IsUUID()
@@ -15,16 +27,33 @@ class FetchItemsLabelsResponseDTO {
 @singleton()
 @JsonController('/v1/lists')
 export default class ListItemLabelsV1Controller {
-  constructor(private service: ListItemService) {}
+  constructor(
+    private listService: ListService,
+    private listItemService: ListItemService,
+  ) {}
 
+  @Authorized('list-items:fetch')
   @Get('/:listId/items-labels')
-  fetchItemsLabels(
+  async fetchItemsLabels(
+    @CurrentUser() user: UserEntity,
     @Params() { listId }: FetchItemsLabelsRequestParamsDTO,
-  ): FetchItemsLabelsResponseDTO {
-    // @todo Throw 404 Not Found if list does not exist
+  ): Promise<FetchItemsLabelsResponseDTO> {
+    try {
+      const list = await this.listService.findOneByIdOrFail(listId)
 
-    const labels = this.service.fetchAllListLabels(listId)
+      if (!list.hasOwner(user)) {
+        throw new UnauthorizedError(`No access to list "${list.id}"`)
+      }
 
-    return { data: labels }
+      const labels = this.listItemService.fetchAllListLabels(list.id)
+
+      return { data: labels }
+    } catch (err) {
+      if (err instanceof AssertionError && err.expected === ListCreated.name) {
+        throw new NotFoundError(`No list found for ID "${listId}"`)
+      }
+
+      throw err
+    }
   }
 }

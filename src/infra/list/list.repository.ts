@@ -4,18 +4,22 @@ import { plainToClass } from 'class-transformer'
 import ListStore from './list.store'
 import ListEntity from '../../domain/list/list.entity'
 import ListCreated from '../../domain/list/listCreated.event'
+import UserEntity, { UserId } from '../../domain/user.entity'
 
 @singleton()
 export default class ListRepository {
   constructor(private listStore: ListStore) {}
 
-  async create(data: { title: string }): Promise<string> {
+  async create(
+    data: { title: string; owners: UserId[] },
+    user: UserEntity,
+  ): Promise<string> {
     const aggregateId = uuid()
     const event = new ListCreated(null, aggregateId, data)
 
     // @todo Assert that aggregate ID is not in use
 
-    await this.listStore.persistEvent(event)
+    await this.listStore.persistEvent(event, user)
 
     return aggregateId
   }
@@ -31,11 +35,11 @@ export default class ListRepository {
     return item
   }
 
-  async findAll(): Promise<ListEntity[]> {
+  async findAllForUser(user: UserEntity): Promise<ListEntity[]> {
     const aggregates = Array.from(this.listStore.getAggregates().values())
 
-    return aggregates.map((aggregate) =>
-      plainToClass(ListEntity, aggregate.data),
-    )
+    return aggregates
+      .map((aggregate) => plainToClass(ListEntity, aggregate.data))
+      .filter((list) => list.hasOwner(user))
   }
 }

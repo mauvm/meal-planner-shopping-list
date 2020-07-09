@@ -9,6 +9,7 @@ import {
 } from 'routing-controllers'
 import glob from 'glob'
 import LoggerService from './domain/logger.service'
+import UserService from './domain/user.service'
 import AutoLoadableStore from './infra/autoLoadableStore.interface'
 import BaseStore from './infra/base.store'
 import { Event, registerEventClass } from './infra/event.store'
@@ -85,10 +86,16 @@ export async function createApp(): Promise<Koa> {
     get: container.resolve.bind(container),
   })
 
+  const userService = container.resolve(UserService)
+
+  // @todo Add `plainToClassTransformOptions: { excludeExtraneousValues: true },` here
+  // @todo Add `@Expose()` to request params/body DTOs
   const app = createKoaServer({
     cors: true,
     controllers: [path.resolve(__dirname, 'app/**/*.controller.{js,ts}')],
     classTransformer: true,
+    authorizationChecker: userService.checkAuthorization.bind(userService),
+    currentUserChecker: userService.getCurrentUser.bind(userService),
   }) as Koa
 
   debugRegisteredControllers()

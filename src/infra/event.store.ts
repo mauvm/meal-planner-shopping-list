@@ -7,8 +7,9 @@ import {
   UserCredentials,
 } from 'node-eventstore-client'
 import { uuid } from 'uuidv4'
-import LoggerService from '../domain/logger.service'
 import AutoLoadableStore from './autoLoadableStore.interface'
+import LoggerService from '../domain/logger.service'
+import UserEntity from '../domain/user.entity'
 
 export class Event {
   static readonly type: string
@@ -90,11 +91,15 @@ export default class EventStore implements AutoLoadableStore {
     this.client.close()
   }
 
-  async persistEvent(streamName: string, event: Event): Promise<string> {
+  async persistEvent(
+    streamName: string,
+    event: Event,
+    user: UserEntity,
+  ): Promise<string> {
     const eventToStore = createJsonEventData(
       uuid(),
       event.data,
-      undefined,
+      { userId: user.id },
       event.type,
     )
 
@@ -127,32 +132,27 @@ export default class EventStore implements AutoLoadableStore {
   }
 
   catchUpStream(streamName: string, callback: EventCallback): void {
-    this.client.subscribeToStreamFrom(
-      streamName,
-      null,
-      false,
-      (subscription, event) => {
-        const eventId = event!.event!.eventId
-        const type = String(event!.event!.eventType)
-        const data = JSON.parse(event!.event!.data!.toString('utf8'))
+    this.client.subscribeToStreamFrom(streamName, null, false, (_, event) => {
+      const eventId = event!.event!.eventId
+      const type = String(event!.event!.eventType)
+      const data = JSON.parse(event!.event!.data!.toString('utf8'))
 
-        let eventClass = eventClasses.find(
-          (eventClass) => eventClass.type === type,
-        )
+      let eventClass = eventClasses.find(
+        (eventClass) => eventClass.type === type,
+      )
 
-        if (!eventClass) {
-          this.logger.error(`No event handler for "${type}"`, {
-            streamName,
-            eventId,
-            type,
-            data,
-          })
-          return
-        }
+      if (!eventClass) {
+        this.logger.error(`No event handler for "${type}"`, {
+          streamName,
+          eventId,
+          type,
+          data,
+        })
+        return
+      }
 
-        const observedEvent = new eventClass(eventId, data.id, data)
-        callback(observedEvent)
-      },
-    )
+      const observedEvent = new eventClass(eventId, data.id, data)
+      callback(observedEvent)
+    })
   }
 }

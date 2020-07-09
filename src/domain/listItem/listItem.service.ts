@@ -1,15 +1,23 @@
 import { singleton } from 'tsyringe'
 import ListItemEntity from './listItem.entity'
+import UserEntity from '../user.entity'
 import ListItemRepository from '../../infra/listItem/listItem.repository'
 
 @singleton()
 export default class ListItemService {
   constructor(private repository: ListItemRepository) {}
 
-  async create(data: { listId: string; title: string }): Promise<string> {
-    data.title = data.title.trim()
-
-    const id = await this.repository.create(data)
+  async create(
+    data: { listId: string; title: string },
+    user: UserEntity,
+  ): Promise<string> {
+    const id = await this.repository.create(
+      {
+        listId: data.listId,
+        title: data.title.trim(),
+      },
+      user,
+    )
 
     return id
   }
@@ -79,21 +87,25 @@ export default class ListItemService {
     )
   }
 
-  async setTitle(id: string, title: string): Promise<void> {
-    await this.repository.setTitle(id, title)
+  async setTitle(id: string, title: string, user: UserEntity): Promise<void> {
+    await this.repository.setTitle(id, title, user)
   }
 
   fetchAllListLabels(listId: string): string[] {
     return this.repository.fetchAllListLabels(listId)
   }
 
-  async setLabels(id: string, labels: string[]): Promise<void> {
+  async setLabels(
+    id: string,
+    labels: string[],
+    user: UserEntity,
+  ): Promise<void> {
     const trimmedLabels = labels.map((label) => label.trim()).filter(Boolean)
 
-    await this.repository.setLabels(id, trimmedLabels)
+    await this.repository.setLabels(id, trimmedLabels, user)
   }
 
-  async finish(id: string): Promise<void> {
-    await this.repository.finish(id)
+  async finish(id: string, user: UserEntity): Promise<void> {
+    await this.repository.finish(id, user)
   }
 }

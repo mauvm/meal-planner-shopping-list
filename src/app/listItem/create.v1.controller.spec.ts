@@ -15,8 +15,6 @@ describe('CreateListItemV1Controller', () => {
   let config: ConfigService
   let eventStore: EventStore
 
-  let listId: string
-
   beforeEach(async () => {
     container.clearInstances()
 
@@ -28,27 +26,64 @@ describe('CreateListItemV1Controller', () => {
 
     const app = await createApp()
     server = app.listen()
-
-    // Dependencies
-    const response = await request(server)
-      .post('/v1/lists')
-      .send({ title: 'Test' })
-      .expect(HttpStatus.CREATED)
-    listId = response.body.id
   })
 
   afterEach(async () => {
     await cleanUpApp(server)
   })
 
-  describe('should have a POST /v1/lists/items endpoint that', () => {
-    it('returns a 404 Not Found on non-existant list', async () => {
+  describe('should have a POST /v1/lists/:listId/items endpoint that', () => {
+    const unknownListId = uuid()
+    const validJwt =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'
+
+    let listId: string
+
+    beforeEach(async () => {
+      // Dependencies
+      const response = await request(server)
+        .post('/v1/lists')
+        .set('Authorization', `Bearer ${validJwt}`)
+        .send({ title: 'Test' })
+        .expect(HttpStatus.CREATED)
+      listId = response.body.id
+    })
+
+    it('returns a 401 Unauthorized on missing JWT', async () => {
+      // Execute
+      const response = await request(server)
+        .post(`/v1/lists/${unknownListId}/items`)
+        .expect(HttpStatus.UNAUTHORIZED)
+        .expect('Content-Type', /json/)
+
+      // Test
+      expect(response.body?.message).to.equal(
+        'Missing Bearer JWT in Authorization header',
+      )
+    })
+
+    it('returns a 401 Unauthorized on invalid JWT', async () => {
       // Data
-      const unknownListId = uuid()
+      const invalidJwt = 'invalid.invalid.invalid'
 
       // Execute
       const response = await request(server)
         .post(`/v1/lists/${unknownListId}/items`)
+        .set('Authorization', `Bearer ${invalidJwt}`)
+        .expect(HttpStatus.UNAUTHORIZED)
+        .expect('Content-Type', /json/)
+
+      // Test
+      expect(response.body?.message).to.equal(
+        'Invalid JWT in Authorization header',
+      )
+    })
+
+    it('returns a 404 Not Found on non-existant list', async () => {
+      // Execute
+      const response = await request(server)
+        .post(`/v1/lists/${unknownListId}/items`)
+        .set('Authorization', `Bearer ${validJwt}`)
         .send({ title: 'Test' })
         .expect(HttpStatus.NOT_FOUND)
         .expect('Content-Type', /json/)
@@ -66,6 +101,7 @@ describe('CreateListItemV1Controller', () => {
       // Execute
       const response = await request(server)
         .post(`/v1/lists/${listId}/items`)
+        .set('Authorization', `Bearer ${validJwt}`)
         .send({ title: tooLongTitle })
         .expect(HttpStatus.BAD_REQUEST)
         .expect('Content-Type', /json/)
@@ -85,6 +121,7 @@ describe('CreateListItemV1Controller', () => {
       // Execute
       const response = await request(server)
         .post(`/v1/lists/${listId}/items`)
+        .set('Authorization', `Bearer ${validJwt}`)
         .send({ title: 'Test' })
         .expect(HttpStatus.CREATED)
         .expect('Content-Type', /json/)
@@ -103,6 +140,7 @@ describe('CreateListItemV1Controller', () => {
       // Execute
       const response = await request(server)
         .post(`/v1/lists/${listId}/items`)
+        .set('Authorization', `Bearer ${validJwt}`)
         .send({ title: 'Test', labels: ['Foo ', '\tBar'] })
         .expect(HttpStatus.CREATED)
 

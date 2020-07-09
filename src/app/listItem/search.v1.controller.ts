@@ -6,9 +6,15 @@ import {
   QueryParam,
   BadRequestError,
   Params,
+  UnauthorizedError,
   NotFoundError,
+  Authorized,
+  CurrentUser,
 } from 'routing-controllers'
 import { IsUUID } from 'class-validator'
+import { plainToClass } from 'class-transformer'
+import UserEntity from '../../domain/user.entity'
+import ListService from '../../domain/list/list.service'
 import ListCreated from '../../domain/list/listCreated.event'
 import ListItemService from '../../domain/listItem/listItem.service'
 import ListItemEntity from '../../domain/listItem/listItem.entity'
@@ -25,21 +31,32 @@ class SearchItemsResponseDTO {
 @singleton()
 @JsonController('/v1/lists')
 export default class SearchListItemV1Controller {
-  constructor(private service: ListItemService) {}
+  constructor(
+    private listService: ListService,
+    private listItemService: ListItemService,
+  ) {}
 
+  @Authorized('list-items:fetch')
   @Get('/:listId/search-items')
-  searchItems(
+  async searchItems(
+    @CurrentUser() user: UserEntity,
     @Params() { listId }: SearchListItemRequestParamsDTO,
     @QueryParam('query') query: string,
-  ): SearchItemsResponseDTO {
+  ): Promise<SearchItemsResponseDTO> {
     if (!query) {
       throw new BadRequestError('Missing query parameter "query"')
     }
 
     try {
-      const items = this.service.searchItems(listId, query)
+      const list = await this.listService.findOneByIdOrFail(listId)
 
-      return { data: items }
+      if (!list.hasOwner(user)) {
+        throw new UnauthorizedError(`No access to list "${list.id}"`)
+      }
+
+      const items = this.listItemService.searchItems(list.id, query)
+
+      return plainToClass(SearchItemsResponseDTO, { data: items })
     } catch (err) {
       if (err instanceof AssertionError && err.expected === ListCreated.name) {
         throw new NotFoundError(`No list found for ID "${listId}"`)
