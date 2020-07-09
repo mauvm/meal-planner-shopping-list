@@ -7,8 +7,9 @@ import {
   UserCredentials,
 } from 'node-eventstore-client'
 import { uuid } from 'uuidv4'
-import LoggerService from '../domain/logger.service'
 import AutoLoadableStore from './autoLoadableStore.interface'
+import LoggerService from '../domain/logger.service'
+import UserEntity from '../domain/user.entity'
 
 export class Event {
   static readonly type: string
@@ -90,11 +91,15 @@ export default class EventStore implements AutoLoadableStore {
     this.client.close()
   }
 
-  async persistEvent(streamName: string, event: Event): Promise<string> {
+  async persistEvent(
+    streamName: string,
+    event: Event,
+    user: UserEntity,
+  ): Promise<string> {
     const eventToStore = createJsonEventData(
       uuid(),
       event.data,
-      undefined,
+      { userId: user.id },
       event.type,
     )
 
@@ -127,11 +132,7 @@ export default class EventStore implements AutoLoadableStore {
   }
 
   catchUpStream(streamName: string, callback: EventCallback): void {
-    this.client.subscribeToAllFrom(null, false, (subscription, event) => {
-      if (event?.originalEvent?.eventStreamId !== streamName) {
-        return
-      }
-
+    this.client.subscribeToStreamFrom(streamName, null, false, (_, event) => {
       const eventId = event!.event!.eventId
       const type = String(event!.event!.eventType)
       const data = JSON.parse(event!.event!.data!.toString('utf8'))

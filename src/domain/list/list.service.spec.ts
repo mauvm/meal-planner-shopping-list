@@ -1,11 +1,12 @@
 import { container } from 'tsyringe'
-import { stub, assert } from 'sinon'
+import { stub, assert, match } from 'sinon'
 import { expect } from 'chai'
 import { uuid } from 'uuidv4'
 import { plainToClass } from 'class-transformer'
 import ListService from './list.service'
 import ListEntity from './list.entity'
 import ListRepository from '../../infra/list/list.repository'
+import UserEntity from '../user.entity'
 
 describe('ListService', () => {
   let service: ListService
@@ -19,22 +20,22 @@ describe('ListService', () => {
   })
 
   describe('should have a "create" method that', () => {
+    const user = plainToClass(UserEntity, { id: 'test|1234' })
+
     it('resolves to an ID for the created list', async () => {
       // Data
       const id = uuid()
       const title = 'Test'
-      let item = plainToClass(ListEntity, { id, title })
 
       // Dependencies
       const create = stub(repository, 'create').resolves(id)
 
       // Execute
-      const promise = service.create({ title })
+      const promise = service.create({ title }, user)
 
       // Test
       await expect(promise).to.eventually.equal(id)
-      assert.calledOnceWithExactly(create, { title })
-      expect(item.id).to.equal(id)
+      assert.calledOnce(create)
     })
 
     it('trims the title', async () => {
@@ -46,20 +47,37 @@ describe('ListService', () => {
       const create = stub(repository, 'create').resolves(id)
 
       // Execute
-      const promise = service.create({ title })
+      const promise = service.create({ title }, user)
 
       // Test
       await expect(promise).to.be.fulfilled
-      assert.calledOnceWithExactly(create, { title: 'Test' })
+      assert.calledOnceWithExactly(create, match({ title: 'Test' }), user)
+    })
+
+    it('sets the user as owner', async () => {
+      // Data
+      const id = uuid()
+      const title = 'Test'
+
+      // Dependencies
+      const create = stub(repository, 'create').resolves(id)
+
+      // Execute
+      const promise = service.create({ title }, user)
+
+      // Test
+      await expect(promise).to.be.fulfilled
+      assert.calledOnceWithExactly(create, match({ owners: [user.id] }), user)
     })
   })
 
   describe('should have a "findOneByIdOrFail" method that', () => {
-    const id = uuid()
-
-    it('resolves to a ListEntity when found for given ID', async () => {
+    it('resolves to ListEntity for given ID', async () => {
       // Data
-      const item = container.resolve(ListEntity)
+      const id = uuid()
+      const item = plainToClass(ListEntity, {
+        createdAt: new Date(),
+      })
 
       // Dependencies
       const findOneOrFail = stub(repository, 'findOneOrFail').resolves(item)
@@ -68,27 +86,13 @@ describe('ListService', () => {
       const promise = service.findOneByIdOrFail(id)
 
       // Test
-      await expect(promise).to.eventually.equal(item)
-      assert.calledOnceWithExactly(findOneOrFail, id)
+      await expect(promise).to.eventually.deep.equal(item)
+      assert.calledOnce(findOneOrFail)
     })
   })
 
-  describe('should have a "findAll" method that', () => {
-    it('resolves to ListEntity[]', async () => {
-      // Data
-      const item1 = plainToClass(ListEntity, {})
-      const item2 = plainToClass(ListEntity, {})
-
-      // Dependencies
-      const findAll = stub(repository, 'findAll').resolves([item1, item2])
-
-      // Execute
-      const promise = service.findAll()
-
-      // Test
-      await expect(promise).to.eventually.deep.equal([item1, item2])
-      assert.calledOnce(findAll)
-    })
+  describe('should have a "findAllForUser" method that', () => {
+    const user = plainToClass(UserEntity, { id: 'test|1234' })
 
     it('resolves to ListEntity[] that is sorted by oldest first', async () => {
       // Data
@@ -100,10 +104,13 @@ describe('ListService', () => {
       })
 
       // Dependencies
-      const findAll = stub(repository, 'findAll').resolves([item1, item2])
+      const findAll = stub(repository, 'findAllForUser').resolves([
+        item1,
+        item2,
+      ])
 
       // Execute
-      const promise = service.findAll()
+      const promise = service.findAllForUser(user)
 
       // Test
       await expect(promise).to.eventually.deep.equal([item2, item1])

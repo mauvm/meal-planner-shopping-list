@@ -15,6 +15,6 @@ export default class ListItemListChanged extends Event {
   }
 
   applyTo(aggregate: any): void {
-    Object.assign(aggregate, this.data)
+    aggregate.listId = this.data.listId
   }
 }

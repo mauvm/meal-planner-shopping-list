@@ -34,12 +34,52 @@ describe('FetchAllListV1Controller', () => {
   })
 
   describe('should have a GET /v1/lists endpoint that', () => {
+    const userId = '1234567890'
+    const validJwt =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'
+
+    it('returns a 401 Unauthorized on missing JWT', async () => {
+      // Execute
+      const response = await request(server)
+        .get('/v1/lists')
+        .expect(HttpStatus.UNAUTHORIZED)
+        .expect('Content-Type', /json/)
+
+      // Test
+      expect(response.body?.message).to.equal(
+        'Missing Bearer JWT in Authorization header',
+      )
+    })
+
+    it('returns a 401 Unauthorized on invalid JWT', async () => {
+      // Data
+      const invalidJwt = 'invalid.invalid.invalid'
+
+      // Execute
+      const response = await request(server)
+        .get('/v1/lists')
+        .set('Authorization', `Bearer ${invalidJwt}`)
+        .expect(HttpStatus.UNAUTHORIZED)
+        .expect('Content-Type', /json/)
+
+      // Test
+      expect(response.body?.message).to.equal(
+        'Invalid JWT in Authorization header',
+      )
+    })
+
     it('returns a 200 OK with lists', async () => {
       // Data
       const id1 = uuid()
       const id2 = uuid()
-      const createdEvent1 = new ListCreated('1', id1, { title: 'List 1' })
-      const createdEvent2 = new ListCreated('2', id2, { title: 'List 2' })
+      const createdEvent1 = new ListCreated('1', id1, {
+        title: 'List 1',
+        owners: [userId],
+      })
+      const createdEvent2 = new ListCreated('2', id2, {
+        title: 'List 2',
+        owners: [userId],
+      })
 
       // Dependencies
       const listStore = container.resolve(ListStore)
@@ -49,6 +89,7 @@ describe('FetchAllListV1Controller', () => {
       // Execute
       const response = await request(server)
         .get('/v1/lists')
+        .set('Authorization', `Bearer ${validJwt}`)
         .expect(HttpStatus.OK)
         .expect('Content-Type', /json/)
 
@@ -65,10 +106,12 @@ describe('FetchAllListV1Controller', () => {
       const id2 = uuid()
       const createdEvent1 = new ListCreated('1', id1, {
         title: 'List 1',
+        owners: [userId],
         createdAt: new Date(Date.now() - 1000).toISOString(),
       })
       const createdEvent2 = new ListCreated('2', id2, {
         title: 'List 2',
+        owners: [userId],
         createdAt: new Date(Date.now() - 2000).toISOString(),
       })
 
@@ -80,6 +123,7 @@ describe('FetchAllListV1Controller', () => {
       // Execute
       const response = await request(server)
         .get('/v1/lists')
+        .set('Authorization', `Bearer ${validJwt}`)
         .expect(HttpStatus.OK)
         .expect('Content-Type', /json/)
 

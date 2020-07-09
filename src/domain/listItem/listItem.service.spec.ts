@@ -6,6 +6,7 @@ import { plainToClass, classToClass } from 'class-transformer'
 import ListItemService from './listItem.service'
 import ListItemEntity from './listItem.entity'
 import ListItemRepository from '../../infra/listItem/listItem.repository'
+import UserEntity from '../user.entity'
 
 describe('ListItemService', () => {
   let service: ListItemService
@@ -19,40 +20,42 @@ describe('ListItemService', () => {
   })
 
   describe('should have a "create" method that', () => {
+    const listId = uuid()
+    const id = uuid()
+    const user = plainToClass(UserEntity, { id: 'test|1234' })
+
     it('resolves to an ID for the created list item', async () => {
       // Data
-      const listId = uuid()
-      const id = uuid()
       const title = 'Test'
-      let item = plainToClass(ListItemEntity, { id, title })
 
       // Dependencies
       const create = stub(repository, 'create').resolves(id)
 
       // Execute
-      const promise = service.create({ listId, title })
+      const promise = service.create({ listId, title }, user)
 
       // Test
       await expect(promise).to.eventually.equal(id)
-      assert.calledOnceWithExactly(create, { listId, title })
-      expect(item.id).to.equal(id)
+      assert.calledOnceWithExactly(create, { listId, title }, user)
     })
 
     it('trims the title', async () => {
       // Data
-      const listId = uuid()
-      const id = uuid()
       const title = ' Test '
 
       // Dependencies
       const create = stub(repository, 'create').resolves(id)
 
       // Execute
-      const promise = service.create({ listId, title })
+      const promise = service.create({ listId, title }, user)
 
       // Test
       await expect(promise).to.be.fulfilled
-      assert.calledOnceWithExactly(create, { listId, title: 'Test' })
+      assert.calledOnceWithExactly(
+        create,
+        { listId, title: title.trim() },
+        user,
+      )
     })
   })
 
@@ -209,20 +212,22 @@ describe('ListItemService', () => {
   })
 
   describe('should have a "setTitle" method that', () => {
+    const id = uuid()
+    const user = plainToClass(UserEntity, { id: 'test|1234' })
+
     it('resolves when item labels have been updated', async () => {
       // Data
-      const id = uuid()
       const title = 'Other title'
 
       // Dependencies
       const setTitle = stub(repository, 'setTitle').resolves()
 
       // Execute
-      const promise = service.setTitle(id, title)
+      const promise = service.setTitle(id, title, user)
 
       // Test
       await expect(promise).to.be.fulfilled
-      assert.calledOnceWithExactly(setTitle, id, title)
+      assert.calledOnceWithExactly(setTitle, id, title, user)
     })
   })
 
@@ -247,69 +252,69 @@ describe('ListItemService', () => {
   })
 
   describe('should have a "setLabels" method that', () => {
+    const id = uuid()
+    const user = plainToClass(UserEntity, { id: 'test|1234' })
+
     it('resolves when item labels have been updated', async () => {
       // Data
-      const id = uuid()
       const labels = ['Foo', 'Bar']
 
       // Dependencies
       const setLabels = stub(repository, 'setLabels').resolves()
 
       // Execute
-      const promise = service.setLabels(id, labels)
+      const promise = service.setLabels(id, labels, user)
 
       // Test
       await expect(promise).to.be.fulfilled
-      assert.calledOnceWithExactly(setLabels, id, labels)
+      assert.calledOnceWithExactly(setLabels, id, labels, user)
     })
 
     it('trims the labels', async () => {
       // Data
-      const id = uuid()
       const labels = [' Foo ', 'Bar\t  ']
 
       // Dependencies
       const setLabels = stub(repository, 'setLabels').resolves()
 
       // Execute
-      const promise = service.setLabels(id, labels)
+      const promise = service.setLabels(id, labels, user)
 
       // Test
       await expect(promise).to.be.fulfilled
-      assert.calledOnceWithExactly(setLabels, id, ['Foo', 'Bar'])
+      assert.calledOnceWithExactly(setLabels, id, ['Foo', 'Bar'], user)
     })
 
     it('ignores empty labels', async () => {
       // Data
-      const id = uuid()
       const labels = ['Foo', '', 'Bar\t  ', '   ']
 
       // Dependencies
       const setLabels = stub(repository, 'setLabels').resolves()
 
       // Execute
-      const promise = service.setLabels(id, labels)
+      const promise = service.setLabels(id, labels, user)
 
       // Test
       await expect(promise).to.be.fulfilled
-      assert.calledOnceWithExactly(setLabels, id, ['Foo', 'Bar'])
+      assert.calledOnceWithExactly(setLabels, id, ['Foo', 'Bar'], user)
     })
   })
 
   describe('should have a "finish" method that', () => {
-    it('resolves when item is marked as finished', async () => {
-      // Data
-      const id = uuid()
+    const id = uuid()
+    const user = plainToClass(UserEntity, { id: 'test|1234' })
 
+    it('resolves when item is marked as finished', async () => {
       // Dependencies
       const finish = stub(repository, 'finish').resolves()
 
       // Execute
-      const promise = service.finish(id)
+      const promise = service.finish(id, user)
 
       // Test
       await expect(promise).to.be.fulfilled
-      assert.calledOnceWithExactly(finish, id)
+      assert.calledOnceWithExactly(finish, id, user)
     })
   })
 })

@@ -3,6 +3,7 @@ import { uuid } from 'uuidv4'
 import { plainToClass } from 'class-transformer'
 import ListStore from '../list/list.store'
 import ListItemStore from './listItem.store'
+import UserEntity from '../../domain/user.entity'
 import ListCreated from '../../domain/list/listCreated.event'
 import ListItemCreated from '../../domain/listItem/listItemCreated.event'
 import ListItemEntity from '../../domain/listItem/listItem.entity'
@@ -17,7 +18,10 @@ export default class ListItemRepository {
     private listItemStore: ListItemStore,
   ) {}
 
-  async create(data: { listId: string; title: string }): Promise<string> {
+  async create(
+    data: { listId: string; title: string },
+    user: UserEntity,
+  ): Promise<string> {
     this.listStore.assertObservedEvent(data.listId, ListCreated)
 
     const aggregateId = uuid()
@@ -25,7 +29,7 @@ export default class ListItemRepository {
 
     // @todo Assert that aggregate ID is not in use
 
-    await this.listItemStore.persistEvent(event)
+    await this.listItemStore.persistEvent(event, user)
 
     return aggregateId
   }
@@ -39,16 +43,6 @@ export default class ListItemRepository {
     // @todo Validate instance
 
     return item
-  }
-
-  async finish(aggregateId: string): Promise<void> {
-    this.listItemStore.assertObservedEvent(aggregateId, ListItemCreated)
-
-    const event = new ListItemFinished(null, aggregateId, {
-      finishedAt: new Date().toISOString(),
-    })
-
-    await this.listItemStore.persistEvent(event)
   }
 
   fetchAllListLabels(listId: string): string[] {
@@ -98,23 +92,41 @@ export default class ListItemRepository {
     )
   }
 
-  async setLabels(aggregateId: string, labels: string[]): Promise<void> {
+  async setLabels(
+    aggregateId: string,
+    labels: string[],
+    user: UserEntity,
+  ): Promise<void> {
     this.listItemStore.assertObservedEvent(aggregateId, ListItemCreated)
 
     const event = new ListItemLabelsChanged(null, aggregateId, {
       labels: labels.sort(),
     })
 
-    await this.listItemStore.persistEvent(event)
+    await this.listItemStore.persistEvent(event, user)
   }
 
-  async setTitle(aggregateId: string, title: string): Promise<void> {
+  async setTitle(
+    aggregateId: string,
+    title: string,
+    user: UserEntity,
+  ): Promise<void> {
     this.listItemStore.assertObservedEvent(aggregateId, ListItemCreated)
 
     const event = new ListItemTitleChanged(null, aggregateId, {
       title,
     })
 
-    await this.listItemStore.persistEvent(event)
+    await this.listItemStore.persistEvent(event, user)
+  }
+
+  async finish(aggregateId: string, user: UserEntity): Promise<void> {
+    this.listItemStore.assertObservedEvent(aggregateId, ListItemCreated)
+
+    const event = new ListItemFinished(null, aggregateId, {
+      finishedAt: new Date().toISOString(),
+    })
+
+    await this.listItemStore.persistEvent(event, user)
   }
 }
