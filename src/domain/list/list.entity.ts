@@ -19,6 +19,9 @@ export default class ListEntity {
   @IsNotEmpty({ each: true })
   owners: UserId[] = []
 
+  @IsString()
+  inviteCode?: string
+
   @IsNotEmpty()
   @IsDate()
   createdAt: Date

@@ -133,5 +133,73 @@ describe('FetchAllListV1Controller', () => {
       expect(lists[0]?.id).to.equal(id2)
       expect(lists[1]?.id).to.equal(id1)
     })
+
+    it('returns a 200 OK with lists that do not have invite codes when not configured', async () => {
+      // Data
+      const id1 = uuid()
+      const id2 = uuid()
+      const createdEvent1 = new ListCreated('1', id1, {
+        title: 'List 1',
+        owners: [userId],
+      })
+      const createdEvent2 = new ListCreated('2', id2, {
+        title: 'List 2',
+        owners: [userId],
+      })
+
+      // Dependencies
+      const listStore = container.resolve(ListStore)
+      listStore.handleEvent(createdEvent1)
+      listStore.handleEvent(createdEvent2)
+
+      config.set('list.inviteCode.secretKey', '')
+
+      // Execute
+      const response = await request(server)
+        .get('/v1/lists')
+        .set('Authorization', `Bearer ${validJwt}`)
+        .expect(HttpStatus.OK)
+        .expect('Content-Type', /json/)
+
+      // Test
+      const lists = response.body?.data
+      expect(lists).to.be.an('array').with.lengthOf(2)
+      expect(lists[0]?.inviteCode).to.be.undefined
+      expect(lists[1]?.inviteCode).to.be.undefined
+    })
+
+    it('returns a 200 OK with lists that have invite codes', async () => {
+      // Data
+      const id1 = uuid()
+      const id2 = uuid()
+      const createdEvent1 = new ListCreated('1', id1, {
+        title: 'List 1',
+        owners: [userId],
+      })
+      const createdEvent2 = new ListCreated('2', id2, {
+        title: 'List 2',
+        owners: [userId],
+      })
+
+      // Dependencies
+      const listStore = container.resolve(ListStore)
+      listStore.handleEvent(createdEvent1)
+      listStore.handleEvent(createdEvent2)
+
+      config.set('list.inviteCode.secretKey', 'test')
+
+      // Execute
+      const response = await request(server)
+        .get('/v1/lists')
+        .set('Authorization', `Bearer ${validJwt}`)
+        .expect(HttpStatus.OK)
+        .expect('Content-Type', /json/)
+
+      // Test
+      const lists = response.body?.data
+      expect(lists).to.be.an('array').with.lengthOf(2)
+      expect(lists[0]?.inviteCode).to.be.a('string').that.is.not.empty
+      expect(lists[1]?.inviteCode).to.be.a('string').that.is.not.empty
+    })
   })
 })

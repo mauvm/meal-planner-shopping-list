@@ -1,7 +1,10 @@
 import 'reflect-metadata'
+import dotenv from 'dotenv'
 import { container } from 'tsyringe'
 import { createApp } from './app'
 import LoggerService from './domain/logger.service'
+
+dotenv.config()
 
 async function run() {
   try {
