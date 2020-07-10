@@ -1,6 +1,6 @@
 import { container } from 'tsyringe'
-import ConfigService from './config.service'
 import { expect } from 'chai'
+import ConfigService from './config.service'
 
 describe('ConfigService', () => {
   let service: ConfigService
