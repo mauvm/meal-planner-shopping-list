@@ -4,11 +4,6 @@ import { singleton } from 'tsyringe'
 import ListEntity from './list.entity'
 import ConfigService from '../config.service'
 
-export type ListInviteCode = {
-  listId: string
-  expiresAt: string
-}
-
 @singleton()
 export default class ListInviteService {
   constructor(private config: ConfigService) {}
@@ -19,7 +14,7 @@ export default class ListInviteService {
   ): string {
     assert.ok(timeToLiveMs > 0, 'Time to live (ms) must be a positive number')
 
-    const data: ListInviteCode = {
+    const data = {
       listId: list.id,
       expiresAt: new Date(Date.now() + timeToLiveMs).toISOString(),
     }
@@ -33,7 +28,7 @@ export default class ListInviteService {
     return crypted + cipher.final('hex')
   }
 
-  resolveInviteCode(code: string): ListInviteCode {
+  getListIdFromInviteCode(code: string): string {
     const decipher = crypto.createDecipheriv(
       'aes-256-gcm',
       this.getSecretKey(),
@@ -48,6 +43,7 @@ export default class ListInviteService {
 
     assert.ok(typeof data.listId === 'string', 'No list ID in list invite code')
     assert.ok(data.listId.length > 0, 'Empty list ID in list invite code')
+
     assert.ok(
       typeof data.expiresAt === 'string',
       'No expire date in list invite code',
@@ -56,11 +52,9 @@ export default class ListInviteService {
       !isNaN(new Date(data.expiresAt).getTime()),
       'Invalid expire date in list invite code',
     )
+    assert.ok(new Date(data.expiresAt) >= new Date(), 'Invite code has expired')
 
-    return {
-      listId: data.listId,
-      expiresAt: data.expiresAt,
-    }
+    return data.listId
   }
 
   private getSecretKey(): Buffer {

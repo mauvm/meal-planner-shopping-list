@@ -5,6 +5,7 @@ import ListStore from './list.store'
 import ListEntity from '../../domain/list/list.entity'
 import ListCreated from '../../domain/list/listCreated.event'
 import UserEntity, { UserId } from '../../domain/user.entity'
+import ListOwnersChanged from '../../domain/list/listOwnersChanged.event'
 
 @singleton()
 export default class ListRepository {
@@ -41,5 +42,17 @@ export default class ListRepository {
     return aggregates
       .map((aggregate) => plainToClass(ListEntity, aggregate.data))
       .filter((list) => list.hasOwner(user))
+  }
+
+  async updateListOwners(
+    aggregateId: string,
+    owners: UserId[],
+    user: UserEntity,
+  ): Promise<void> {
+    this.listStore.assertObservedEvent(aggregateId, ListCreated)
+
+    const event = new ListOwnersChanged(null, aggregateId, { owners })
+
+    await this.listStore.persistEvent(event, user)
   }
 }

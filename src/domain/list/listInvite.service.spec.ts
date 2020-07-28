@@ -52,32 +52,15 @@ describe('ListInviteService', () => {
       // Test
       expect(result).to.be.a('string').that.is.not.empty
     })
-
-    it('returns invite code that expires in three days by default', () => {
-      // Dependencies
-      config.set('list.inviteCode.secretKey', 'test')
-
-      // Execute
-      const result = service.createInviteCode(list)
-
-      // Test
-      expect(result).to.be.a('string').that.is.not.empty
-      const decrypted = service.resolveInviteCode(result)
-      const threeDaysMs = 3 * 24 * 60 * 60 * 1000
-      expect(Number(new Date(decrypted.expiresAt))).to.be.closeTo(
-        Date.now() + threeDaysMs,
-        1000,
-      )
-    })
   })
 
-  describe('should have a "resolveInviteCode" method that', () => {
+  describe('should have a "getListIdFromInviteCode" method that', () => {
     it('throws error when no secret key is configured', () => {
       // Dependencies
       config.set('list.inviteCode.secretKey', '')
 
       // Execute
-      const result = () => service.resolveInviteCode('abcd')
+      const result = () => service.getListIdFromInviteCode('abcd')
 
       // Test
       expect(result).to.throw(
@@ -94,7 +77,7 @@ describe('ListInviteService', () => {
       const code = service.createInviteCode(list)
 
       // Execute
-      const result = () => service.resolveInviteCode(code)
+      const result = () => service.getListIdFromInviteCode(code)
 
       // Test
       expect(result).to.throw('No list ID in list invite code')
@@ -109,27 +92,41 @@ describe('ListInviteService', () => {
       const code = service.createInviteCode(list)
 
       // Execute
-      const result = () => service.resolveInviteCode(code)
+      const result = () => service.getListIdFromInviteCode(code)
 
       // Test
       expect(result).to.throw('Empty list ID in list invite code')
     })
 
-    it('returns decrypted list invite data', () => {
+    it('throws error when decrypted code has expired', async () => {
+      // Data
+      const list = plainToClass(ListEntity, { id: '1234' })
+
+      // Dependencies
+      config.set('list.inviteCode.secretKey', 'test')
+      const code = service.createInviteCode(list, 1)
+      await new Promise((resolve) => setTimeout(resolve, 10)) // Ensure invite code expired
+
+      // Execute
+      const result = () => service.getListIdFromInviteCode(code)
+
+      // Test
+      expect(result).to.throw('Invite code has expired')
+    })
+
+    it('returns decrypted list ID', () => {
       // Data
       const list = plainToClass(ListEntity, { id: uuid() })
 
       // Dependencies
       config.set('list.inviteCode.secretKey', 'test')
-      const code = service.createInviteCode(list, 1)
+      const code = service.createInviteCode(list, 1000)
 
       // Execute
-      const result = service.resolveInviteCode(code)
+      const result = service.getListIdFromInviteCode(code)
 
       // Test
-      expect(result.listId).to.equal(list.id)
-      expect(result.expiresAt).to.be.a('string').that.is.not.empty
-      expect(Number(new Date(result.expiresAt))).to.be.closeTo(Date.now(), 1000)
+      expect(result).to.equal(list.id)
     })
   })
 })
