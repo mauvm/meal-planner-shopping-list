@@ -68,6 +68,17 @@ describe('ListInviteService', () => {
       )
     })
 
+    it('throws error when unable to decrypt code', () => {
+      // Dependencies
+      config.set('list.inviteCode.secretKey', 'test')
+
+      // Execute
+      const result = () => service.getListIdFromInviteCode('test')
+
+      // Test
+      expect(result).to.throw('Unable to parse JSON from invite code')
+    })
+
     it('throws error when decrypted code has no list ID', () => {
       // Data
       const list = plainToClass(ListEntity, { id: undefined })

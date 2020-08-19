@@ -39,7 +39,13 @@ export default class ListInviteService {
     // Using decipher final results in error:
     // "Unsupported state or unable to authenticate data"
     // @see https://github.com/nodejs/help/issues/1034
-    const data = JSON.parse(decrypted) // + decipher.final('utf8'))
+    let data: any
+
+    try {
+      data = JSON.parse(decrypted) // + decipher.final('utf8'))
+    } catch (err) {
+      throw new Error('Unable to parse JSON from invite code')
+    }
 
     assert.ok(typeof data.listId === 'string', 'No list ID in list invite code')
     assert.ok(data.listId.length > 0, 'Empty list ID in list invite code')

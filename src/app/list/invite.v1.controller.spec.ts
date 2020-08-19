@@ -112,12 +112,14 @@ describe('ListInviteV1Controller', () => {
       const response = await request(server)
         .post('/v1/lists/invite')
         .set('Authorization', `Bearer ${validJwt}`)
-        .send({ code: 'invalidcode' })
+        .send({ code: 'test' })
         .expect(HttpStatus.BAD_REQUEST)
         .expect('Content-Type', /json/)
 
       // Test
-      expect(response.body?.message).to.equal('Bad input string')
+      expect(response.body?.message).to.equal(
+        'Unable to parse JSON from invite code',
+      )
     })
 
     describe('with ListInviteService', () => {
