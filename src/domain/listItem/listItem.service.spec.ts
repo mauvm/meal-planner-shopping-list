@@ -1,7 +1,7 @@
 import { container } from 'tsyringe'
 import { stub, assert, SinonStub } from 'sinon'
 import { expect } from 'chai'
-import { uuid } from 'uuidv4'
+import { v4 as uuid } from 'uuid'
 import { plainToClass, classToClass } from 'class-transformer'
 import ListItemService from './listItem.service'
 import ListItemEntity from './listItem.entity'

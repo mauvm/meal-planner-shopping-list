@@ -6,7 +6,7 @@ import {
   expectedVersion,
   UserCredentials,
 } from 'node-eventstore-client'
-import { uuid } from 'uuidv4'
+import { v4 as uuid } from 'uuid'
 import AutoLoadableStore from './autoLoadableStore.interface'
 import LoggerService from '../domain/logger.service'
 import UserEntity from '../domain/user.entity'

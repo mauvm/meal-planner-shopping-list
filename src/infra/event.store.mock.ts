@@ -1,5 +1,5 @@
 import { singleton } from 'tsyringe'
-import { uuid } from 'uuidv4'
+import { v4 as uuid } from 'uuid'
 import EventStore, { Event, EventCallback } from './event.store'
 
 @singleton()

@@ -1,6 +1,6 @@
 import { container } from 'tsyringe'
 import { expect } from 'chai'
-import { uuid } from 'uuidv4'
+import { v4 as uuid } from 'uuid'
 import { plainToClass } from 'class-transformer'
 import ListInviteService from './listInvite.service'
 import ListEntity from './list.entity'

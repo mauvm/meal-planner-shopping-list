@@ -1,5 +1,5 @@
 import { singleton } from 'tsyringe'
-import { uuid } from 'uuidv4'
+import { v4 as uuid } from 'uuid'
 import { plainToClass } from 'class-transformer'
 import ListStore from '../list/list.store'
 import ListItemStore from './listItem.store'
