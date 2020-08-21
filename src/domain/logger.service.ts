@@ -22,6 +22,7 @@ export default class LoggerService {
           winston.format.align(),
           winston.format.printf((info) => {
             const { timestamp, level, message } = info
+            // @ts-ignore Info key can only be string, but SPLAT is a symbol
             const args = info[SPLAT] || {}
             const ts = timestamp.slice(0, 19).replace('T', '')
             const meta =
