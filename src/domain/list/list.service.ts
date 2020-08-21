@@ -35,4 +35,8 @@ export default class ListService {
 
     return lists
   }
+
+  async updateListOwners(list: ListEntity, user: UserEntity): Promise<void> {
+    await this.repository.updateListOwners(list.id, list.owners, user)
+  }
 }

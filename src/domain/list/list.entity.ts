@@ -19,12 +19,23 @@ export default class ListEntity {
   @IsNotEmpty({ each: true })
   owners: UserId[] = []
 
+  @IsString()
+  inviteCode?: string
+
   @IsNotEmpty()
   @IsDate()
   createdAt: Date
 
   hasOwner(user: UserEntity): boolean {
     return this.owners?.length > 0 && this.owners.includes(user.id)
+  }
+
+  addOwner(user: UserEntity): void {
+    this.owners = this.owners || []
+
+    if (!this.hasOwner(user)) {
+      this.owners.push(user.id)
+    }
   }
 
   hasItem(item: ListItemEntity): boolean {

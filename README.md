@@ -9,6 +9,11 @@ This service requires an [EventStore](https://eventstore.com/) instance for pers
 ## Local Development
 
 ```bash
+# Configure
+cp .env.example .env
+chmod 600 .env
+edit .env
+
 yarn install
 
 # See https://github.com/mauvm/meal-planner-infrastructure

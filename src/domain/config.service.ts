@@ -1,4 +1,5 @@
 import { singleton } from 'tsyringe'
+import { constantCase } from 'constant-case'
 
 @singleton()
 export default class ConfigService {
@@ -8,7 +9,11 @@ export default class ConfigService {
     this.internal.set(path, value)
   }
 
-  get<T>(path: string, defaultTo: T): T {
-    return this.internal.get(path) ?? defaultTo
+  get<T = string>(path: string, defaultTo: T | undefined = undefined): T {
+    return this.internal.get(path) ?? this.getFromEnv(path) ?? defaultTo
+  }
+
+  private getFromEnv(path: string): string | undefined {
+    return process.env[constantCase(path)]
   }
 }
