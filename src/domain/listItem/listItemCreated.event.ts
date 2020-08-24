@@ -22,6 +22,8 @@ export default class ListItemCreated extends Event {
   }
 
   applyTo(aggregate: any): void {
+    // No need to assert aggregate ID, because this applyTo() will add it
+
     Object.assign(aggregate, this.data)
   }
 }

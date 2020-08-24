@@ -15,6 +15,8 @@ export default class ListItemTitleChanged extends Event {
   }
 
   applyTo(aggregate: any): void {
+    this.assertAggregateId(aggregate)
+
     aggregate.title = this.data.title
   }
 }

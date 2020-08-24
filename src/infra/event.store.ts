@@ -1,3 +1,4 @@
+import assert from 'assert'
 import { singleton } from 'tsyringe'
 import {
   createConnection,
@@ -24,8 +25,17 @@ export class Event {
     this.data.id = aggregateId
   }
 
-  applyTo(data: any): void {
-    Object.assign(data, this.data)
+  applyTo(aggregate: any): void {
+    this.assertAggregateId(aggregate)
+
+    Object.assign(aggregate, this.data)
+  }
+
+  assertAggregateId(aggregate: any) {
+    assert.ok(
+      aggregate.id === this.data.id,
+      `Invalid aggregate ID for ${this.type} event (${aggregate.id} must be equal to ${this.data.id})`,
+    )
   }
 }
 

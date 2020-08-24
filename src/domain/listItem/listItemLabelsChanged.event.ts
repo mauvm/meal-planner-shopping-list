@@ -15,6 +15,8 @@ export default class ListItemLabelsChanged extends Event {
   }
 
   applyTo(aggregate: any): void {
+    this.assertAggregateId(aggregate)
+
     aggregate.labels = this.data.labels
   }
 }

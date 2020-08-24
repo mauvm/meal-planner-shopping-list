@@ -16,6 +16,8 @@ export default class ListOwnersChanged extends Event {
   }
 
   applyTo(aggregate: any): void {
+    this.assertAggregateId(aggregate)
+
     aggregate.owners = this.data.owners
   }
 }

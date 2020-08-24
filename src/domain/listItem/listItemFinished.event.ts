@@ -19,6 +19,8 @@ export default class ListItemFinished extends Event {
   }
 
   applyTo(aggregate: any): void {
+    this.assertAggregateId(aggregate)
+
     aggregate.finishedAt = this.data.finishedAt
   }
 }
